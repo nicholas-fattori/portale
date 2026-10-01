@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portale Didattico STEM - Superiori</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SCRIPT DI PROTEZIONE ACCESSO -->
+    <script>
+        if (sessionStorage.getItem("isLoggedIn") !== "true") {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <div class="app-layout">
+        <!-- SIDEBAR DI NAVIGAZIONE -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon"><i class="fa-solid fa-atom"></i></div>
+                <div class="logo-text">
+                    <h2>STEM Portal</h2>
+                    <span>ITIS / Superiori</span>
+                </div>
+                <button class="close-sidebar" id="closeSidebar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#home" class="nav-item active" data-section="home">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <a href="#elettrotecnica" class="nav-item" data-section="elettrotecnica">
+                    <i class="fa-solid fa-bolt"></i> Elettrotecnica
+                </a>
+                <a href="#elettronica" class="nav-item" data-section="elettronica">
+                    <i class="fa-solid fa-microchip"></i> Elettronica
+                </a>
+                <a href="#impiantistica" class="nav-item" data-section="impiantistica">
+                    <i class="fa-solid fa-network-wired"></i> Impiantistica
+                </a>
+                <a href="#laboratorio" class="nav-item" data-section="laboratorio">
+                    <i class="fa-solid fa-flask-vial"></i> Laboratorio
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <div>
+                        <strong id="userNameDisplay">Docente</strong>
+                        <small id="userRoleDisplay">Amministratore</small>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="btn-logout" title="Esci dal portale">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTENUTO PRINCIPALE -->
+        <main class="main-content">
+            <!-- TOPBAR MOBILE & DESKTOP -->
+            <header class="topbar">
+                <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="breadcrumb">
+                    <span id="currentSectionTitle">Home Dashboard</span>
+                </div>
+                <div class="topbar-right">
+                    <span class="status-indicator"><span class="dot"></span> Sistema Attivo</span>
+                </div>
+            </header>
+
+            <!-- AREE CONTENUTO (Sezioni) -->
+            <div class="content-body">
+
+                <!-- 1. SEZIONE HOME -->
+                <section id="sec-home" class="content-section active">
+                    <div class="hero-card">
+                        <div class="hero-text">
+                            <span class="badge-tag">Benvenuto nel Portale</span>
+                            <h1>Innovazione e Didattica <span class="highlight">STEM</span></h1>
+                            <p>Piattaforma digitale di supporto allo studio e alla progettazione tecnica per gli istituti superiori. Seleziona una sezione dal menu per accedere ai materiali didattici, agli schemi e alle guide di laboratorio.</p>
+                            <div class="hero-stats">
+                                <div class="stat-box">
+                                    <i class="fa-solid fa-bolt"></i>
+                                    <div><strong>Circuiti</strong><span>AC / DC</span></div>
+                                </div>
+                                <div class="stat-box">
+                                    <i class="fa-solid fa-microchip"></i>
+                                    <div><strong>Sistemi</strong><span>Analogici / Digitali</span></div>
+                                </div>
+                                <div class="stat-box">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    <div><strong>Sicurezza</strong><span>Norme CEI / Idoneità</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hero-graphic">
+                            <i class="fa-solid fa-cubes-stacked floating-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="section-title-wrapper">
+                        <h2><i class="fa-solid fa-compass"></i> Accesso Rapido alle Aree</h2>
+                        <p>Scegli un modulo per iniziare la consultazione o inserire i contenuti</p>
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="nav-card" onclick="switchSection('elettrotecnica')">
+                            <div class="card-icon"><i class="fa-solid fa-bolt"></i></div>
+                            <h3>Elettrotecnica</h3>
+                            <p>Studio dei circuiti elettrici, leggi di Ohm e Kirchhoff, sistemi trifase e macchine elettriche.</p>
+                            <span class="card-link">Accedi alla sezione <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+
+                        <div class="nav-card" onclick="switchSection('elettronica')">
+                            <div class="card-icon"><i class="fa-solid fa-microchip"></i></div>
+                            <h3>Elettronica</h3>
+                            <p>Componenti a semiconduttore, amplificatori operazionali, microcontrollori e logiche digitali.</p>
+                            <span class="card-link">Accedi alla sezione <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+
+                        <div class="nav-card" onclick="switchSection('impiantistica')">
+                            <div class="card-icon"><i class="fa-solid fa-network-wired"></i></div>
+                            <h3>Impiantistica</h3>
+                            <p>Progettazione impianti civili e industriali, dimensionamento cavi, protezioni e normative vigenti.</p>
+                            <span class="card-link">Accedi alla sezione <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+
+                        <div class="nav-card" onclick="switchSection('laboratorio')">
+                            <div class="card-icon"><i class="fa-solid fa-flask-vial"></i></div>
+                            <h3>Laboratorio</h3>
+                            <p>Protocolli di sicurezza, guide all'uso di oscilloscopi, multimetri, banchi prova e relazioni di esperimenti.</p>
+                            <span class="card-link">Accedi alla sezione <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. SEZIONE ELETTROTECNICA -->
+                <section id="sec-elettrotecnica" class="content-section">
+                    <div class="section-header-box">
+                        <div>
+                            <h2><i class="fa-solid fa-bolt"></i> Elettrotecnica</h2>
+                            <p>Materiali didattici, appunti di teoria, formule e schemi circuitali.</p>
+                        </div>
+                        <button class="btn-action" onclick="alert('Area pronta per inserire i tuoi contenuti personalizzati!')">
+                            <i class="fa-solid fa-plus"></i> Aggiungi Contenuto
+                        </button>
+                    </div>
+
+                    <div class="content-placeholder-card">
+                        <div class="placeholder-icon"><i class="fa-solid fa-pen-ruler"></i></div>
+                        <h3>Sezione pronta per i tuoi contenuti</h3>
+                        <p>Qui potrai inserire dispense in PDF, video lezioni, esercizi svolti e simulazioni SPICE per gli studenti.</p>
+                    </div>
+                </section>
+
+                <!-- 3. SEZIONE ELETTRONICA -->
+                <section id="sec-elettronica" class="content-section">
+                    <div class="section-header-box">
+                        <div>
+                            <h2><i class="fa-solid fa-microchip"></i> Elettronica</h2>
+                            <p>Dispositivi elettronici, analogici e digitali.</p>
+                        </div>
+                        <button class="btn-action" onclick="alert('Area pronta per inserire i tuoi contenuti personalizzati!')">
+                            <i class="fa-solid fa-plus"></i> Aggiungi Contenuto
+                        </button>
+                    </div>
+
+                    <div class="content-placeholder-card">
+                        <div class="placeholder-icon"><i class="fa-solid fa-pen-ruler"></i></div>
+                        <h3>Sezione pronta per i tuoi contenuti</h3>
+                        <p>Inserisci qui schede tecniche di diodi, transistori, datasheet di Arduino/ESP32 e progetti pratici.</p>
+                    </div>
+                </section>
+
+                <!-- 4. SEZIONE IMPIANTISTICA -->
+                <section id="sec-impiantistica" class="content-section">
+                    <div class="section-header-box">
+                        <div>
+                            <h2><i class="fa-solid fa-network-wired"></i> Impiantistica</h2>
+                            <p>Progettazione impiantistica civile, industriale e norme CEI.</p>
+                        </div>
+                        <button class="btn-action" onclick="alert('Area pronta per inserire i tuoi contenuti personalizzati!')">
+                            <i class="fa-solid fa-plus"></i> Aggiungi Contenuto
+                        </button>
+                    </div>
+
+                    <div class="content-placeholder-card">
+                        <div class="placeholder-icon"><i class="fa-solid fa-pen-ruler"></i></div>
+                        <h3>Sezione pronta per i tuoi contenuti</h3>
+                        <p>Inserisci qui tabelle di portata dei cavi, schemi unifilari, dimensionamento dei magnetotermici e differenziali.</p>
+                    </div>
+                </section>
+
+                <!-- 5. SEZIONE LABORATORIO -->
+                <section id="sec-laboratorio" class="content-section">
+                    <div class="section-header-box">
+                        <div>
+                            <h2><i class="fa-solid fa-flask-vial"></i> Laboratorio</h2>
+                            <p>Esperienze pratiche, guide strumentali e sicurezza.</p>
+                        </div>
+                        <button class="btn-action" onclick="alert('Area pronta per inserire i tuoi contenuti personalizzati!')">
+                            <i class="fa-solid fa-plus"></i> Aggiungi Contenuto
+                        </button>
+                    </div>
+
+                    <div class="content-placeholder-card">
+                        <div class="placeholder-icon"><i class="fa-solid fa-pen-ruler"></i></div>
+                        <h3>Sezione pronta per i tuoi contenuti</h3>
+                        <p>Inserisci qui i template per le relazioni di laboratorio, regolamento di sicurezza e guide all'uso dell'oscilloscopio.</p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Script principale portale -->
+    <script>
+        // Gestione nome utente loggato
+        document.getElementById("userNameDisplay").textContent = sessionStorage.getItem("currentName") || "Utente";
+        document.getElementById("userRoleDisplay").textContent = sessionStorage.getItem("currentRole") === "docente" ? "Docente / Admin" : "Studente";
+
+        // Logout
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            sessionStorage.clear();
+            window.location.href = "login.html";
+        });
+
+        // Gestione navigazione sezioni SPA (Single Page Application fluida)
+        const navItems = document.querySelectorAll(".sidebar-nav .nav-item");
+        const sections = document.querySelectorAll(".content-section");
+        const currentSectionTitle = document.getElementById("currentSectionTitle");
+        
+        const sectionTitles = {
+            "home": "Home Dashboard",
+            "elettrotecnica": "Elettrotecnica",
+            "elettronica": "Elettronica",
+            "impiantistica": "Impiantistica",
+            "laboratorio": "Laboratorio"
+        };
+
+        function switchSection(targetSection) {
+            sections.forEach(sec => sec.classList.remove("active"));
+            navItems.forEach(item => item.classList.remove("active"));
+
+            const targetSecElem = document.getElementById(`sec-${targetSection}`);
+            const targetNavElem = document.querySelector(`.sidebar-nav .nav-item[data-section="${targetSection}"]`);
+
+            if (targetSecElem) targetSecElem.classList.add("active");
+            if (targetNavElem) targetNavElem.classList.add("active");
+
+            currentSectionTitle.textContent = sectionTitles[targetSection] || "Portale STEM";
+
+            // Chiusura automatica sidebar su mobile dopo click
+            if (window.innerWidth <= 992) {
+                document.getElementById("sidebar").classList.remove("open");
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener("click", (e) => {
+                e.preventDefault();
+                const section = item.getAttribute("data-section");
+                switchSection(section);
+            });
+        });
+
+        // Toggle sidebar mobile
+        const menuToggle = document.getElementById("menuToggle");
+        const closeSidebar = document.getElementById("closeSidebar");
+        const sidebar = document.getElementById("sidebar");
+
+        menuToggle.addEventListener("click", () => {
+            sidebar.classList.add("open");
+        });
+
+        closeSidebar.addEventListener("click", () => {
+            sidebar.classList.remove("open");
+        });
+    </script>
+</body>
+</html>

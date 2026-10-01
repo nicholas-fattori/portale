@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accesso Portale STEM - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Google per un look moderno -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="login-body">
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="stem-badge"><i class="fa-solid fa-microchip"></i> STEM PORTAL</div>
+                <h1>Area Riservata</h1>
+                <p>Inserisci le credenziali di accesso per entrare nel portale didattico.</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="input-group">
+                    <label for="username"><i class="fa-solid fa-user"></i> Username</label>
+                    <input type="text" id="username" placeholder="Es. prof.stem" required autocomplete="username">
+                </div>
+
+                <div class="input-group">
+                    <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+
+                <div id="errorMessage" class="error-msg hidden">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span id="errorText">Credenziali errate.</span>
+                </div>
+
+                <div id="attemptsWarning" class="attempts-warning">
+                    Tentativi rimasti: <span id="attemptsCount">3</span>/3
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-primary">
+                    <i class="fa-solid fa-right-to-bracket"></i> Accedi al Portale
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <small><i class="fa-solid fa-shield-halved"></i> Accesso protetto per istituti superiori</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collegamento al DB locale -->
+    <script src="db-config.js"></script>
+    <script>
+        // Gestione logica tentativi e autenticazione
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("loginForm");
+            const usernameInput = document.getElementById("username");
+            const passwordInput = document.getElementById("password");
+            const errorMessage = document.getElementById("errorMessage");
+            const errorText = document.getElementById("errorText");
+            const attemptsCountSpan = document.getElementById("attemptsCount");
+            const submitBtn = document.getElementById("submitBtn");
+
+            // Inizializza tentativi rimasti da sessionStorage o config
+            let maxAttempts = window.DB_CONFIG.maxAttempts;
+            let currentAttempts = sessionStorage.getItem("login_attempts");
+            
+            if (currentAttempts === null) {
+                currentAttempts = maxAttempts;
+                sessionStorage.setItem("login_attempts", currentAttempts);
+            } else {
+                currentAttempts = parseInt(currentAttempts);
+            }
+
+            attemptsCountSpan.textContent = currentAttempts;
+
+            if (currentAttempts <= 0) {
+                blockLogin("Numero massimo di tentativi esaurito. Ricarica la pagina o contatta l'amministratore.");
+            }
+
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                
+                if (currentAttempts <= 0) return;
+
+                const userVal = usernameInput.value.trim();
+                const passVal = passwordInput.value.trim();
+
+                // Cerca nel DB
+                const foundUser = window.DB_CONFIG.users.find(
+                    u => u.username === userVal && u.password === passVal
+                );
+
+                if (foundUser) {
+                    // Login riuscito
+                    sessionStorage.setItem("isLoggedIn", "true");
+                    sessionStorage.setItem("currentUser", foundUser.username);
+                    sessionStorage.setItem("currentRole", foundUser.role);
+                    sessionStorage.setItem("currentName", foundUser.nome);
+                    
+                    // Reset tentativi
+                    sessionStorage.removeItem("login_attempts");
+
+                    // Reindirizzamento alla home del portale
+                    window.location.href = "index.html";
+                } else {
+                    // Login fallito
+                    currentAttempts--;
+                    sessionStorage.setItem("login_attempts", currentAttempts);
+                    attemptsCountSpan.textContent = currentAttempts;
+
+                    if (currentAttempts > 0) {
+                        errorMessage.classList.remove("hidden");
+                        errorText.textContent = `Credenziali non valide. Ti rimangono ${currentAttempts} tentativi.`;
+                        passwordInput.value = "";
+                        passwordInput.focus();
+                    } else {
+                        blockLogin("Accesso bloccato per troppi tentativi errati.");
+                    }
+                }
+            });
+
+            function blockLogin(message) {
+                errorMessage.classList.remove("hidden");
+                errorText.textContent = message;
+                usernameInput.disabled = true;
+                passwordInput.disabled = true;
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = "0.5";
+                submitBtn.style.cursor = "not-allowed";
+            }
+        });
+    </script>
+</body>
+</html>

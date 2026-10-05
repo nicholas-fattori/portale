@@ -227,14 +227,317 @@
                         <div>
                             <h2><i class="fa-solid fa-microchip"></i> Elettronica</h2>
                         </div>
-                        <button class="btn-action" onclick="alert('Area pronta per inserire i tuoi contenuti personalizzati!')">
-                            <i class="fa-solid fa-plus"></i> Aggiungi Contenuto
-                        </button>
+                <h2>Giunzione PN</h2>
+<p>Una giunzione p-n si costruisce mettendo in stretto contatto due semiconduttori estrinsechi (=estranei), uno drogato p, l’altro n. Il semiconduttore positivo ha prevalentemente lacune, mentre quello di tipo n ha elettroni. Per la presenza di portatori di carica liberi da entrambi i lati, prende avvio un processo di diffusione per cui gli elettroni si spostano dal lato n al lato p e la lacune, invece, nel verso opposto. Tutto questo accade fino a quando non si raggiunge una nuova situazione di equilibrio. La proprietà più importante di un dispositivo così creato, consente il passaggio di corrente elettrica solo in una direzione e non nell’altra.</p>
+<div class="container">
+<img src="giunzione.png" width="350" height="250" alt="Giunzione PN" />
+</div>
+<h2>Teoria delle bande</h2>
+<p>I semiconduttori sono materiali capaci di controllare la loro conducibilità in funzione della struttura chimica e la presenza di materiali droganti. A differenza dei conduttori, nei semiconduttori gli elettroni devono acquisire energia per attraversare il gap energetico (o banda proibita) e raggiungere così la banda di conduzione. La banda proibita (come visibile in figura) è un intervallo di energia tra banda di valenza e banda di conduzione. Classifichiamo i semiconduttori in base, dunque, alla loro performance in questo gap tra le due bande.</p>
+<div class="container">
+<img src="fermi.png" width="400" height="200" alt="Teoria delle bande" />
+</div>
+<p>La struttura a bande elettroniche è definita dal comportamento di elettroni e lacune in un reticolo cristallino. Descrive l’intervallo di livelli di energia che gli elettroni possono (o non) assumere all’interno.</p>
+<p>A temperatura assoluta zero, tutti gli elettroni in un semiconduttore si trovano nella banda di valenza e, dunque, non ci sono elettroni liberi nella banda di conduzione. Ma, a temperatura ambiente o superiori, alcuni elettroni inizialmente nella banda di valenza, possono essere eccitati da fonti di energia esterna come un campo elettrico, saltando nella banda di conduzione, e lasciando nella posizione originale nella banda di valenza, una lacuna.
+Il comportamento di questi portatori di carica è influenzato da fattori come struttura cristallina, tipologia di drogaggio, temperatura o difetti/impurità nel reticolo cristallino.</p>
+<p>I semiconduttori intrinseci hanno un numero perfettamente bilanciato di elettroni liberi e lacune, e la loro conducibilità aumenta esponenzialmente con la temperatura. I semiconduttori estrinseci (drogati con impurità) hanno una concentrazione molto più alta di elettroni liberi o lacune, avendo di conseguenza, una notevole conducibilità che li rende perfetti per i dispositivi elettronici. Per livello di Fermi si intende il lavoro necessario per modificare l’energia interna di un sistema aggiungendo un elettrone al corpo. Nei metalli, si intende il livello energetico più alto occupato. </p>
+<h2>Resistore</h2>
+<p>E' un componente elettrico passivo che limita il flusso di corrente in un circuito. Il valore resistivo è misurato in Ohm (<b>Ω</b>). Le più comuni a film di carbone (vedi foto) presentano un nucleo ceramico rivestito da una sottile pellicola di carbonio. I resistori variabili vengono chiamati potenziometri.</p>
+<div class="container">
+<img src="resistore.jpg" width="400" height="200" alt="Foto di una resistenza" />
+</div>
+<h2>Condensatore</h2>
+<p>I condensatori possono immagazzinare l'energia elettrica caricandosi e scaricandosi. L'energia liberata può essere paragonata a quella di una batteria, ma l'unico modo per controllarla è sviluppare un circuito di comando. Per controllare, invece, la velocità di carica e scarica sono sufficienti una sorgente di tensione e dei resistori in serie.</p>
+<div class="container">
+<img src="armatura.gif" width="400" height="200" alt="Costruzione di un condensatore" />
+</div>
+<p> Le due piastre in figura separate da un materiale isolante detto <b>dielettrico</b> formano un condensatore, che immagazzina elettricità.</p>
+<p> La carica che può essere immagazzinata è proporzionale alla tensione applicata ed alla capacità (misurata in <b>Farad</b>) del condensatore che dipende da:</p>
+<ul>
+<li> distanza che separa le piastre </li>
+<li> dimensione delle piastre </li>
+<li> natura del dielettrico </li>
+</ul>
+<p> La forza esercitata dagli atomi del dielettrico applicata una tensione sulle piastre, se grande, consente agli elettroni di distaccarsi e la corrente può fluire tra le due piastre, nonostante la natura isolante del dielettrico, e la chiamiamo tensione di rottura o di <b>breakdown</b>.</p>
+<p> La capacità di condensatori collegati in <b>parallelo</b> uguaglia la somma delle singole capacità.</p>
+<p> Condensatori collegati in <b>serie</b> hanno una capacità totale uguale al reciproco della somma dei reciproci delle singole capacità.</p>
+<div class="container">
+<img src="parallelo.png" width="300" height="150" alt="Formula condensatori in parallelo" />
+<img src="serie.png" width="300" height="150" alt="Formula condensatori in serie" />
+
+
+</div>
+<p align="center"> Formula capacità in parallelo (a sinistra) e in serie (a destra).</p>
+<p> I condensatori possono essere di diverse tipologie: </p>
+<ul>
+<li> ceramici --> molto diffusi per la loro compattezza e stabilità, ideali per circuiti ad alta frequenza</li>
+<li> elettrolitici --> usano un liquido/gel come dielettrico e hanno un'alta capacità per le dimensioni, ma sono polarizzati (devono essere collegati rispettando polarità positiva e negativa)</li>
+<li> a film (poliestere) --> utilizzano un film plastico come dielettrico, sono stabili, affidabili e con tolleranza alle alte temperature </li>
+<li> al tantalio --> Sottocategoria degli elettrolitici, sono di piccole dimensioni e offrono alta capacità, ma sono polarizzati </li>
+</ul>
+<div class="container">
+<img src="tipi.png" width="350" height="150" alt="Diverse tipologie di condensatori" />
+</div>
+<p> I condensatori sopra sono definiti fissi, ma ne esistono anche variabili, in quanto all'interno del circuito possono variare la loro capacità.</p>
+
+<h2>Diodo</h2>
+<p>Un diodo è un componente passivo semiconduttore che consente alla corrente di circolare in un’unica direzione, impendendo la circolazione nella direzione opposta. Potremmo dire che si comporta come un interruttore unidirezionale. Sono chiamati anche raddrizzatori, perché modificano la corrente alternata (AC) in corrente continua pulsante (DC), ossia una corrente che un’istante c’è e quello successivo non c’è più, ripetendosi numerose volte al secondo in rapida successione.</p>
+<p>I diodi hanno una polarità determinata da un anodo (terminale positivo) e da un catodo (terminale negativo). Quando un diodo permette il flusso di corrente è polarizzato in modo diretto, quando invece polarizzato inversamente, funziona da isolante non consentendo passaggio di corrente.</p>
+<p>In riferimento alle ultime esperienze laboratoriali, il diodo serve a proteggere il transistor dalla corrente prodotta dal motore una volta che, terminata l’alimentazione, ruoterà per inerzia. Si precisa inoltre, che, senza il diodo, la tensione che attraversa il motore potrebbe aumentare quanto basta per danneggiare il transistor usato per pilotarlo (ovviamente quantitativamente si diversifica a seconda del transistor utilizzato). Il diodo utilizzato nelle nostre ultime esperienze laboratoriali è il 1N4007, un diodo raddrizzatore utilizzato come valvola di non ritorno a senso unico. Questo diodo è elettricamente compatibile con altri diodi raddrizzatori della famiglia 1N400x.
+</p>
+<div class="container">
+<img src="diodi.png" width="400" height="200" alt="Tipologie di diodi" />
+</div>
+<h3>Tipi di diodi</h3>
+<li><b>diodo zener: </b>caratterizzato da una tensione inversa di breakdown (regione), detta tensione di Zener, particolarmente stabile e definita, tipicamente utilizzato come stabilizzatore della tensione, per creare circuiti regolatori con tensioni costanti, partendo da tensioni più elevate</li>
+<li><b>diodo schottky: </b>costituito da una giunzione metallo-semiconduttore, come alluminio in giunzione a silicio drogato (tipo n), offre ottime prestazioni di commutazione, molto usato in forma discreta (ossia singolarmente) e nei circuiti integrati ed è caratterizzato da una tensione di soglia minore ed un tempo di recupero inverso</li>
+<li><b>diodo varicap:</b>diodi utilizzati come capacità variabili, effetto dipendente dalla tensione di polarizzazione inversa in prossimità della giunzione, trovano applicazione in alta frequenza (circuiti moltiplicatori), in amplificatori radiofrequenza e oscillatori</li>     
+<li><b>diodo emettitore di luce (led): </b>dispositivo a giunzione con particolari materiali semiconduttori, che emette radiazioni luminose quando attraversato da corrente, in un diodo polarizzato direttamente scorre una corrente diretta dovuta al movimento contemporaneo di elettroni verso la zona p e di lacune verso la zona n</li>
+<li><b>foto diodo: </b>diodo sensibile alle radiazioni luminose, che a contatto con il fotodiodo polarizzato inversamente, crea numerosi portatori liberi, trova impiego nei controlli ottici e nel campo delle telecomunicazioni come terminale di fibre ottiche </li>
+<p> </p>
+<div class="container">
+<img src="tipidiodi.png" width="400" height="200" alt="Simbologie grafiche diodi" />
+</div>
+<p>Esempio datasheet: <a href="Diodo1N4007.pdf" target="_blank" title="Datasheet 1N4007">Diodo 1N4007</a></p>
+<p>Calcolo resistenza su caduta di tensione led <a href="EsercizioCalcoloResistenzaLed.pdf" target="_blank" title="Caduta di tensione resistenza led">esercizio svolto</a></p>
+<h2>Relè</h2>
+<p>E' un dispositivo pilotato a distanza che consente di commutare più circuiti, sia separatamente che in gruppo. Potrebbe essere paragonato ad un interruttore, con la differenze che, il suo comando, avviene in modo automatico tramite un apposto circuito, e grazie alla corrente elettrica.</p>
+<p>Il relè è composto da una bobina di filo di rame (con due terminali) avvolta intorno ad un nucleo di materiale ferromagnetico, e da una serie di contatti elettrici azionabili dall’apposita staffa.</p>
+<p>La corrente percorre la bobina, il nucleo si magnetizza e attrae a sé la staffa, che a sua volta sposta la lamella centrale dei contatti operando una commutazione, quindi uno spostamento.</p>
+<div class="container">
+<img src="rele.jpg" width="300" height="150" alt="Un relè" />
+</div>
+<p>Comunemente le tensioni di funzionamento sono di 5, 12 o 24V.</p>
+<h2>Transistor</h2>
+<p>Considerato il componente elettronico per eccellenza. Prima delle sua invenzione, i circuiti elettronici utilizzavano valvole termoioniche.</p>
+<p>E’ stato il primo componente elettronico attivo (perché a partire da una fonte esterna in ingresso restituisce in uscita un segnale più potente) inventato. Alcuni metalli, una volta portati ad alte temperature, emettono degli elettroni liberi che fluiscono all’interno della valvola (verosimilmente possiamo paragonarle alle vecchie lampadine a incandescenza).</p>
+<p>Il primo transistor risale al 1925 costruito in Canada da Liliefeld, realizzato mettendo a contatto due elettrodi puntiformi con un diaframma di germanio di tipo N (come già si faceva per il diodo), successivamente si iniziò ad utilizzare anche il noto silicio, dimostratosi da subito molto più versatile ed efficiente. Negli anni ’70 inizia la corsa ai circuiti integrati (logici) il flip-flop ne è l’esempio più classico ed in seguito i circuiti analogici. Oggi in un millimetro quadrato troviamo integrati milioni di transistori che svolgono diverse funzioni.</p>
+<p>Gli elementi base sono semiconduttori: germanio e silicio, come già detto. A differenza dei conduttori, come sappiamo, qui sono presenti pochi elettroni in movimento libero. Dove l’elettrone si sposta lascia una lacuna nell’atomo, cioè di carica positiva, pari a quella dell’elettrone, ovviamente con segno opposto. Elettroni e lacune sono in numero pari nel semiconduttore puro. Se lo droghiamo con un elemento che crea eccesso di elettroni (cariche negative) o protoni (positive) otteniamo semiconduttori drogati rispettivamente di tipo N e di tipo P.</p>
+<p>Un transistor si ottiene con doppia giunzione. E’ un componente elettronico con 3 piedini, rappresentanti base (B), emettitore (E) e collettore (C), riscontrabili anche nella foto sotto riportata. Il terminale di base è detto “collegamento fra le teste” e si dividono in NPN e PNP.</p>
+<div class="container">
+<img src="transistor.png" width="300" height="150" alt="Un transistor" />
+</div>
+<p>Cominciando dal transistor NPN (a sinistra) osserviamo che la corrente, proveniente dal polo positivo, entra nel collettore, una seconda corrente definita “di comando” entra nella base. Dall’emettitore esce quindi una corrente ie = ic + ib, che torna al polo negativo dell’alimentazione.
+Nel caso del transistor PNP è necessario montarlo rovesciato, e dunque la corrente proveniente dal polo positivo entrerà nell’emettitore. Parte di questa uscirà poi dalla base, costituendo la corrente di comando ib. Mentre nel transistor npn la corrente è entrante, nel transistor pnp osserviamo dunque che la corrente di base è uscente.
+</p>
+<p>Le lettere PNP e NPN mostrano la tensione richiesta dai tre componenti. Nel transistor NPN la corrente di conduzione è principalmente di elettroni (infatti ha una conduzione più alta, in quanto gli elettroni sono più mobili), mentre nel PNP la corrente di conduzione è dovuta ai fori. Quindi, nel transistor NPN la corrente scorre dal collettore all’emettitore poiché l’alimentazione positiva è data alla base, mentre nel transistor PNP la corrente scorre dall’emettitore al collettore.</p>
+<h3>Transistor BJT</h3>
+<p>Detto transistor a giunzione bipolare è largamente usato nel campo elettronico analogico principalmente come amplificatore di corrente e interruttore. Costituisce la famiglia più diffusa insieme al transistor ad effetto di campo, è in grado di offrire una maggiore corrente in uscita con lo svantaggio però, di non avere il terminale isolato (gate).</p>
+<p>Può controllare la corrente che lo attraversa mediante applicazione di tensione tra i suoi terminali. Tale dispositivo coinvolge sia gli elettroni, sia le lacune (portatori di carica maggioritari) e pertanto è detto bipolare. Viene spesso utilizzato come interruttore adatto per attivare o disattivare circuiti o trasduttori ad esempio (i trasduttori o sensori sono dispositivi che acquisiscono in ingresso una grandezza fisica esprimendo in uscita una grandezza elettrica con valore di funzione della grandezza entrante). In tutte le applicazioni il funzionamento di un transistor è legato a due particolari strati di giunzione bipolare: saturazione (ON) e interdizione (OFF).</p>
+<p>Nella saturazione è indispensabile che le due giunzioni siano polarizzate direttamente (ON). Nell’interdizione il transistor non conduce (OFF), si verifica quando entrambe le giunzioni sono polarizzate inversamente.</p>
+<div class="container">
+<img src="bjt.png" width="300" height="200" alt="Transistor bjt" />
+</div>
+<p>Un transistor npn non può essere interdetto se la tensione V è minore o uguale a zero, mentre un altro di tipo pnp può considerarsi interdetto se la tensione V è maggiore o uguale a zero. Idealmente il transistor passa nello stato OFF ed ON e viceversa istantaneamente. Se si verificasse questo fenomeno non avremmo dispersioni di calore da parte del transistor, perché esso non assorbe potenza: nello stato di interdizione non passa corrente e nello stato di saturazione è presente una tensione nulla.</p>
+<p>Nell’elettronica digitale il transistor è usato come amplificatore: una corrente di base controlla la corrente di collettore e, tenuto conto della resistenza tra collettore ed emettitore, una certa corrente base controlla la corrente che scorre tra collettore ed emettitore.</p>
+<p>Riassumendo, un transistor in funzione della tensione di polarizzazione (tensione applicata alla base), può funzionare in tre zone:</p>
+<li>INTERDIZIONE (interruttore aperto): resistenza massima tra collettore ed emettitore non permettendo passaggio di corrente tra due terminali</li>
+<li>SATURAZIONE (interruttore chiuso): resistenza minima tra collettore ed emettitore, passaggio della massima corrente tra questi due terminali</li>
+<li>LINEARE: zona usata nell’amplificazione dei segnali</li>
+<p>Esempio datasheet: <a href="BC337.PDF" target="_blank" title="Datasheet BC337">Transistor BC337</a></p>
+<h3>Transistor MOSFET</h3>
+<p>Detto anche transistor a semiconduttore di ossido di metallo ad effetto campo. E’ un dispositivo che commuta o amplifica un segnale elettronico. Ha reso i computer molto più piccoli ed efficienti. I MOSFET sono cruciali per i segnali digitali e analogici e trovano impiego nei microprocessori e nei circuiti integrati. Fondamentali in logica digitale per i computer ad esempio, e impiegati invece come interruttori e resistori di precisione in campo analogico. Sono costituiti da un substrato di materiale semiconduttore (solitamente silicio) ed uno strato di metallo che separa lo strato centrale di ossigeno, su cui confluisce l’energia che scorre tra gli altri due strati. A questa struttura vengono affiancati i due terminali: source e drain.</p>
+<div class="container">
+<img src="mosfet.jpeg" width="400" height="200" alt="Transistor mosfet" />
+</div>
+<p>La tensione viene applicata alla fonte sullo strato metallico, quello di ossigeno serve come cancello che permette all’elettricità di fluire tra gli altri due strati. L’energia elettrica viene dissipata nello strato semiconduttore e trasferita ad una pletora di dispositivi che regolano funzioni logiche. Se non viene applicata elettricità alla sorgente, il MOSFET si spegne.</p>
+<p>Il suo più notevole utilizzo è nei circuiti integrati, digitali e di memoria come RAM e ROM ed anche la CPU. E’ simile al transistor bipolare, presenta due varianti:</p>
+<li>con drogaggio di tipo P chiamate PMOS e NMOS</li>
+<li>utilizza transistori a effetto di campo metallo-ossido-semiconduttore con drogaggio di tipo N</li>
+<p>Se usate entrambe le tipologie è denominato CMOS.</p>
+<p>Il suo vantaggio è rappresentato dall'integrazione in circuiti di piccola scala e di diversa tipologia. Supporta sia tensioni positive e negative (può controllare oltre 2.000 Watt di potenza). Come contro è incline al surriscaldarsi date le grandi prestazioni elettriche e dunque potrebbe ridurre la performance nei circuiti.</p>
+<h3>BJT vs MOSFET</h3>
+<div class="container">
+<img src="versus.png" width="400" height="150" alt="BJT vs MOSFET" />
+</div>
+<p>In elettronica digitale prevale nettamente il MOSFET per la principale caratteristica di essere auto-isolato dunque che può essere implementato nella stessa regione di silicio assieme ad altri componenti anche uguali senza interferire. Questo facilita la connessione serie e parallelo riducendo costi e complessità progettuale (ecco perché lo troviamo nei microchip), ma con i BJT non è possibile. Se invece necessitiamo di commutazione, trasferimento di potenza e convertitori di potenza è bene utilizzare un transistor BJT. Il BJT riesce a mantenere potenze fino a 2kW e correnti fino a 500A. C’è da considerare però, che per piccole potenze abbiamo bisogno di frequenze di commutazione elevate, dove il MOSFET rappresenta di nuovo la scelta ottimale. Ricapitoliamo:</p>
+<li>MOSFET può gestire cambi di stato con frequenze nell’ordine dei MHz</li>
+<li>BJT riesce a gestire frequenze di commutazione al di sotto dei 100 kHz</li>
+
+<h2>Circuiti stampati</h2>
+<p>Un circuito stampato detto PCB (Printed Circuit Board) è un supporto isolante (solitamente fibra di vetro con resina epossidica, ossia che passa da stato liquido a solido diventando impermeabile, resistente e lucido) con piste di rame incise che collegano componenti elettronici.</p>
+      <p>Una volta progettato in CAD, viene creato un substrato rivestendo una lastra di rame in entrambi i lati, applicando poi un photoresist, ossia un polimero che cambia le proprie proprietà strutturali a contatto con i raggi UV. Viene rimosso il rame non protetto (etching) e creati i fori che ospiteranno i componenti.</p>      
+        <p>I fori vengono metalizzati e poi applicato uno strato protettivo di vari colori detto solder mask.</p>
+           <p>I circuiti stampati differiscono per numero di strati (layers):</p>
+            <li> monostrato </li>
+            <li> bistrato </li>
+            <li> multistrato </li>
+            Inoltre possono essere:
+            <li> rigidi </li>
+            <li> flessibili </li>
+            <li> semi-flessibili</li>
+            
+<p>Come porte logiche è importante ricordare: </p>
+            <li>AND -> 1 se tutti INPUT = 1 </li>
+            <li>OR -> 1 se almeno uno = 1 </li>
+            <li>NOT -> inversione </li>
+            <li>XOR -> 1 se INPUT diversi </li>
+
+            <p> Quando i circuiti integrati digitali hanno porte logiche caratterizzate dalla sola presenza di transistor bipolari si parla di tecnologia TTL (Transistor-Transistor Logic), più datata, che opera a 5V fissi con alto consumo.</p>
+            <p> La tecnologia CMOS (Complementary MOS) più moderna e attuale, invece, usa MOSFET a basso consumo (soprattutto a riposo) funzionanti a 3-15V ed alta immunità ai rumori, ed ha un'impedenza di ingresso molto alta.</p>
+          <p>Considerazione: la serie 74HCT è progettata specificamente per essere compatibile con i livelli di tensione TTL.</p>
+
+            <p>Il trigger flip-flop è un circuito sequenziale che memorizza 1 bit usato in registri e contatori. Con più flip-flop si ottiene un counter.</p>
+           <p>Esempi:</p> 
+            <li> SR latch</li>
+          <li> D flip-flop</li> 
+          <li> JK flip-flop</li> 
+          <li> T flip-flop</li> 
+            <p>Le interferenze EMI sono disturbi elettromagnetici che degradano i segnali, causati ad esempio da switching, clock e motori.</p>
+           <p>Le scariche elettrostatiche ESD sono causate da cariche accumulate (anche >10kV) e possono distruggere MOSFET, integrati e sensori.</p>
+            <p>Il conformal coating è un rivestimento protettivo sottile applicato sulla scheda.</p>
+            
+            <h2>Teoria sui segnali</h2>
+            <p>Nel nostro campo il funzionamento di sensori, centraline e attuatori si basa sull’elaborazione di segnali elettrici. Un segnale elettrico è una grandezza, solitamente una tensione o una corrente, che varia nel tempo e che trasporta un’informazione.
+Un <b>segnale analogico</b> è un segnale che può assumere infiniti valori all’interno di un intervallo continuo. Questo tipo di segnale è particolarmente adatto a rappresentare fenomeni fisici reali, che cambiano gradualmente.
+Esempio nell’auto: il sensore di temperatura del liquido di raffreddamento fornisce alla centralina una tensione analogica che varia, ipotizziamo, da 0,5 V (motore freddo) a 4,5 V (motore caldo). La variazione è continua e proporzionale alla temperatura.
+            </p>
+            
+<p>Un segnale analogico può essere misurato con:</p>
+<li> multimetro (lettura del valore istantaneo)</li>
+<li> oscilloscopio (visualizzazione della variazione nel tempo) </li>
+<p>Il principale svantaggio dei segnali analogici è la loro sensibilità ai disturbi elettrici, molto presenti nei veicoli auto o moto.</p>
+
+<p>Un <b>segnale digitale</b> assume solo valori discreti, tipicamente due:</p>
+<li> 0 logico (LOW)</li>
+<li> 1 logico (HIGH)</li>
+                
+<p>Questi livelli corrispondono a specifici valori di tensione, ad esempio:</p>
+<li> 0–1 V → LOW </li>
+<li> 4–5 V → HIGH </li>
+<p>Esempio inerente l’auto:  un sensore di velocità ruota ABS genera un impulso che corrisponde al passaggio di un dente della ruota fonica davanti al sensore.</p>
+
+<p>Con un oscilloscopio si osserverebbe chiaramente una sequenza di impulsi, mentre con un multimetro si potrebbero leggere solo un valore medio, poco significativo.</p>
+
+<h3>Graficazione dei segnali</h3>
+<p>Per studiare un segnale elettrico si utilizza una rappresentazione grafica (come visto in classe):</p>
+<li> sull’asse orizzontale (X) è riportato il tempo</li>
+<li> sull’asse verticale (Y) è riportata la tensione</li>
+                
+<p>Questa rappresentazione permette di analizzare:</p>
+<li> ampiezza del segnale</li>
+<li> periodo e frequenza</li>
+<li> forma d’onda</li>
+                
+<p>Nel settore automotive è fondamentale riconoscere a colpo d’occhio se un segnale è corretto o alterato.</p>
+
+<h3>Studio del segnale su oscilloscopio</h3>
+
+<p>L’oscilloscopio è lo strumento più importante per la diagnostica elettronica.
+Con l’oscilloscopio è possibile:</p>
+                
+<li> osservare la forma del segnale</li>
+<li> misurare tensione massima e minima</li>
+<li> calcolare periodo e frequenza</li>
+<li> individuare disturbi e anomalie </li>
+                
+<p>Esempio pratico: Durante la diagnosi di un iniettore, l’oscilloscopio permette di visualizzare l’impulso di comando proveniente dalla centralina e verificare:</p>
+
+<li> durata dell’impulso</li>
+<li> presenza di sovratensioni</li>
+<li> corretto pilotaggio dell’attuatore</li>
+
+<p>Il multimetro, in questo caso, non sarebbe sufficiente.</p>
+
+<h3>Onda quadra </h3>
+
+<p>L’onda quadra è un segnale periodico che alterna due livelli di tensione ben definiti.
+È molto diffusa perché:</p>
+<li> semplice da generare </li>
+<li> facilmente riconoscibile</li>
+<li> ideale per il controllo digitale</li>
+<p>Esempio: Il segnale di comando di una elettrovalvola o di un relè è spesso un’onda quadra.
+
+Parametri importanti:</p>
+<li> livello alto</li>
+<li> livello basso</li>
+<li> periodo</li>
+<li> frequenza</li>
+
+
+<h3>Modulazione PWM (Pulse Width Modulation)</h3>
+
+<p>PWM è una tecnica che consente di controllare la potenza fornita a un carico variando il tempo di attivazione del segnale, mantenendo costante l’ampiezza.
+Concetto chiave:  non si cambia la tensione, ma per quanto tempo viene applicata.
+
+Esempio nell’auto:  la velocità della ventola di raffreddamento o di un motore elettrico viene regolata variando il duty cycle del segnale PWM.</p>
+
+<p>Misurazione elettrica:</p>
+<li> con oscilloscopio → si vede chiaramente la variazione degli impulsi</li>
+<li> con multimetro → si legge una tensione media</li>
+
+<h3>Duty Cycle</h3>
+
+<p>Il duty cycle rappresenta la percentuale di tempo in cui il segnale è attivo (ON) rispetto al periodo totale.
+
+Esempi:</p>
+<li> 20% → bassa potenza (attuatore poco attivo)</li>
+<li> 50% → potenza media</li>
+<li> 80% → alta potenza</li>
+<p>Nel controllo degli iniettori benzina, la quantità di carburante iniettata dipende direttamente dal duty cycle.
+</p>
+<h3>Trasduttori</h3>
+
+<p>Un trasduttore è un dispositivo che trasforma una grandezza fisica in un segnale elettrico o viceversa.
+
+I sensori forniscono alla centralina informazioni sullo stato del veicolo.
+    
+Esempi nell’auto:</p>
+<li> sensore di pressione collettore</li>
+<li> sensore posizione farfalla</li>
+<li> sensore temperatura aria </li>
+
+<p>Gli attuatori trasformano il segnale elettrico in un’azione fisica.
+
+Esempi:</p>
+<li> iniettori</li>
+<li> elettrovalvole</li>
+<li> motorini elettrici</li>
+                
+<p>Sono spesso controllati tramite segnali PWM.</p>
+
+<h3>Diagnostica centraline ECU</h3>
+
+<p>Le centraline elettroniche controllano praticamente ogni sistema dell’auto moderna.
+                
+La comunicazione tra centraline avviene tramite reti:</p>
+<li> CAN</li>
+<li> LIN</li>
+<li> FlexRay</li>
+<p>Una corretta diagnosi richiede la conoscenza dei segnali elettrici e la capacità di interpretarli correttamente.</p>
+
+<h3>Reti CAN BUS</h3>
+
+<p>Nelle auto moderne sono presenti molte centraline elettroniche (ECU): motore, ABS, airbag, climatizzazione, quadro strumenti, ecc. Se ogni centralina fosse collegata alle altre con fili dedicati, il veicolo avrebbe:</p>
+<li> chilometri di cablaggi</li>
+<li> maggior peso</li>
+<li> maggiore probabilità di guasti</li>
+
+<p>Il CAN bus (Controller Area Network) nasce per permettere alle centraline di scambiarsi informazioni su una rete comune, riducendo cablaggi e aumentando l’affidabilità.</p>
+
+<p>Il CAN bus è una rete di comunicazione seriale:</p>
+<li> multi-master (tutte le centraline possono trasmettere)</li>
+<li> basata su messaggi (non su indirizzi)</li>
+<li> molto robusta ai disturbi elettrici</li>
+<p>È stato sviluppato per funzionare in ambienti “ostili” come l’automotive (vibrazioni, rumore elettrico, temperature elevate).</p>
+
+<p>Il CAN utilizza due fili intrecciati:</p>
+<li> CAN High (CAN-H)</li>
+<li> CAN Low (CAN-L)</li>
+
+<p>Alle estremità della rete sono presenti resistenze di terminazione da 120 Ω, necessarie per evitare riflessioni del segnale.</p>
+
+<p>Guasti: </p>
+<li> interruzione di un filo CAN-H o CAN-L</li>
+<li> corto a massa o a positivo</li>
+<li> resistenza di terminazione errata</li>
+
+<p>Controlli tipici: </p>
+<li>resistenza tra CAN-H e CAN-L ≈ 60 Ω (due resistenze da 120 Ω in parallelo)</li>
+
+<p>Con l’oscilloscopio si osservano due segnali speculari.</p>
                     </div>
 
-                    <div class="content-placeholder-card">
-                        <div class="placeholder-icon"><i class="fa-solid fa-pen-ruler"></i></div>
-                    </div>
                 </section>
 
                 <!-- 4. SEZIONE IMPIANTISTICA -->

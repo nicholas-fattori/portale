@@ -651,6 +651,20 @@ body {
 }
 
 /* --- RESPONSIVE DESIGN (CELLULARE E TABLET) --- */
+.iframe-responsivo {
+  width: 100%;                 /* Occupa tutta la larghezza della sezione */
+  aspect-ratio: 16 / 9;        /* Mantiene la proporzione (es. 16:9 come i video) */
+  border: none;                /* Rimuove il bordo predefinito dell'iframe */
+  display: block;              /* Evita spazi vuoti indesiderati sotto l'iframe */
+}
+
+/* Opzionale: Regola la proporzione per i dispositivi mobili */
+@media (max-width: 768px) {
+  .iframe-responsivo {
+    aspect-ratio: 4 / 3;       /* Su mobile diventa un po' più quadrato, ideale per leggere il testo */
+  }
+}
+
 @media (max-width: 992px) {
     .sidebar {
         transform: translateX(-100%);

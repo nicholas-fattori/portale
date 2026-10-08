@@ -47,6 +47,10 @@ body {
     max-width: 420px;
 }
 
+.container {
+  text-align: center;
+}
+
 .login-card {
     background: var(--card-bg);
     padding: 40px;

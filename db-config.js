@@ -9,6 +9,7 @@ const DATABASE_CREDENTIALS = {
         { username: "dalcero", password: "thomas2026", role: "studente", nome: "Studente Thomas Dal Cero" },
         { username: "confente", password: "anvedi2026", role: "studente", nome: "Studente Thomas Confente" },
         { username: "kumar", password: "divyansh2026", role: "studente", nome: "Studente Divyansh Kumar" },
+        { username: "cavazza", password: "leandro2026", role: "studente", nome: "Studente Leandro Cavazza" },
         { username: "santillo", password: "paride2026", role: "studente", nome: "Studente Paride Santillo" },
         { username: "bruzzo", password: "gabriele2026", role: "studente", nome: "Studente Gabriele Bruzzo" },
         { username: "paticchia", password: "marco2026", role: "studente", nome: "Studente Marco Paticchia" },

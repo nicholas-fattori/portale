@@ -55,7 +55,7 @@ const DATABASE_CREDENTIALS = {
         { username: "abbamonte", password: "francesco2026", role: "studente", nome: "Studente Francesco Abbamonte" },
         { username: "ajdini", password: "egli2026", role: "studente", nome: "Studente Egli Ajdini" },
         { username: "aldighieri", password: "michele2026", role: "studente", nome: "Studente Michele Aldighieri" },
-        { username: "abdelbasset", password: "arinate2026", role: "studente", nome: "Studente Arinate Abdelbasset" },
+        { username: "arinate", password: "abdelbasset2026", role: "studente", nome: "Studente Arinate Abdelbasset" },
         { username: "axinia", password: "marcocostantin2026", role: "studente", nome: "Studente Marco Costantin Axinia" },
         { username: "barbu", password: "stefanofrancesco2026", role: "studente", nome: "Studente Stefano Francesco Barbu" },
         { username: "belba", password: "gioele2026", role: "studente", nome: "Studente Gioele Belba" },

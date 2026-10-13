@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impianto Elettrico Residenziale Avanzato - Livello 3 CEI 64-8 & Domotica</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tech: {
+                            dark: '#0B0F19',
+                            card: '#131C2E',
+                            border: '#1E293B',
+                            accent: '#38BDF8',
+                            purple: '#A855F7',
+                            emerald: '#10B981',
+                            amber: '#F59E0B',
+                            rose: '#F43F5E'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glow-blue { box-shadow: 0 0 25px rgba(56, 189, 248, 0.25); }
+        .glow-emerald { box-shadow: 0 0 25px rgba(16, 185, 129, 0.25); }
+        .glow-purple { box-shadow: 0 0 25px rgba(168, 85, 247, 0.25); }
+        .glow-amber { box-shadow: 0 0 25px rgba(245, 158, 11, 0.25); }
+        
+        /* Custom animations */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+        .animate-pulse-glow { animation: pulseGlow 3s infinite ease-in-out; }
+
+        @keyframes flowAnimation {
+            0% { stroke-dashoffset: 24; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .energy-flow {
+            stroke-dasharray: 8, 8;
+            animation: flowAnimation 1s linear infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+    </style>
+</head>
+<body class="bg-tech-dark text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-tech-dark/90 backdrop-blur-md border-b border-tech-border px-4 lg:px-8 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center glow-blue text-white font-bold text-lg shadow-lg">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-sky-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+                        SmartHome Studio Pro
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium">Impianto Elettrico Residenziale Avanzato • Livello 3 (CEI 64-8)</p>
+                </div>
+            </div>
+
+            <!-- Quick Action Toolbar -->
+            <div class="flex items-center flex-wrap gap-2">
+                <button onclick="startTour()" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap"></i> Tour Guidato Studenti
+                </button>
+                <button onclick="openSimulationModal()" class="px-4 py-2 bg-tech-card hover:bg-slate-800 border border-tech-border text-sky-400 font-semibold text-xs rounded-xl transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Simulatore Carichi & Flussi
+                </button>
+                <button onclick="resetAllSystems()" class="px-3 py-2 bg-tech-card hover:bg-rose-950/40 border border-tech-border hover:border-rose-500/50 text-slate-400 hover:text-rose-400 rounded-xl transition-all text-xs" title="Reset Impianti">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Interactive Floorplan Infographic & Visualizer (8 Cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            
+            <!-- System Status Dashboard Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-tech-card border border-tech-border rounded-2xl p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-solar-panel"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">Fotovoltaico</span>
+                        <span id="metric-pv" class="text-sm font-bold font-mono text-sky-400">4.5 kW Prod.</span>
+                    </div>
+                </div>
+
+                <div class="bg-tech-card border border-tech-border rounded-2xl p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-battery-full"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">Accumulo Litio</span>
+                        <span id="metric-battery" class="text-sm font-bold font-mono text-emerald-400">85% (10 kWh)</span>
+                    </div>
+                </div>
+
+                <div class="bg-tech-card border border-tech-border rounded-2xl p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-charging-station"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">Wallbox EV</span>
+                        <span id="metric-ev" class="text-sm font-bold font-mono text-purple-400">7.4 kW (Attiva)</span>
+                    </div>
+                </div>
+
+                <div class="bg-tech-card border border-tech-border rounded-2xl p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">Antifurto & Allarme</span>
+                        <span id="metric-alarm" class="text-sm font-bold font-mono text-amber-400">Inserito Totale</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Blueprint Container -->
+            <div class="bg-tech-card border border-tech-border rounded-3xl p-6 relative overflow-hidden flex flex-col shadow-2xl">
+                
+                <!-- Card Header -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-tech-border gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-house-chimney-user text-sky-400"></i> Pianta Architettonica & Impianto Interattivo Livello 3
+                        </h2>
+                        <p class="text-xs text-slate-400">Clicca sui quadratini terminali delle linee per esplorare le specifiche tecniche CEI 64-8.</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Rete Attiva
+                        </span>
+                    </div>
+                </div>
+
+                <!-- SVG Blueprint Visualizer with Guaranteed Connected Terminal Nodes -->
+                <div class="relative w-full aspect-[16/10] my-4 bg-[#070A12] rounded-2xl border border-tech-border overflow-hidden flex items-center justify-center">
+                    
+                    <!-- Blueprint Grid Pattern background -->
+                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px]"></div>
+
+                    <!-- SVG Connection Wires & Rooms -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1000 600" preserveAspectRatio="none">
+                        <!-- Main Power Feed lines from QE to Rooms -->
+                        <path d="M 500 120 L 500 240" stroke="#38bdf8" stroke-width="3" fill="none" class="energy-flow" />
+                        <path d="M 500 240 L 250 240" stroke="#38bdf8" stroke-width="2.5" fill="none" />
+                        <path d="M 500 240 L 750 240" stroke="#38bdf8" stroke-width="2.5" fill="none" />
+                        
+                        <path d="M 250 240 L 180 180" stroke="#10b981" stroke-width="2" fill="none" />
+                        <path d="M 250 240 L 320 180" stroke="#a855f7" stroke-width="2" fill="none" />
+                        <path d="M 250 240 L 180 420" stroke="#f59e0b" stroke-width="2" fill="none" />
+                        
+                        <path d="M 750 240 L 680 180" stroke="#f43f5e" stroke-width="2" fill="none" />
+                        <path d="M 750 240 L 820 420" stroke="#38bdf8" stroke-width="2" fill="none" />
+                        <path d="M 500 120 L 200 80" stroke="#38bdf8" stroke-dasharray="4,4" stroke-width="2" fill="none" />
+                        <path d="M 500 120 L 800 80" stroke="#10b981" stroke-dasharray="4,4" stroke-width="2" fill="none" />
+                    </svg>
+
+                    <!-- Room Cards & Terminal Node Buttons Placed Exactly at Wire Ends -->
+                    <div class="absolute inset-0 p-6 grid grid-cols-3 grid-rows-3 gap-4 pointer-events-auto">
+                        
+                        <!-- Roof / PV & Storage (Top Center) -->
+                        <div class="col-start-2 row-start-1 flex flex-col items-center justify-center">
+                            <div onclick="openNodeDetail('pv')" class="group cursor-pointer bg-tech-dark/90 hover:bg-sky-950/60 border border-sky-500/40 hover:border-sky-400 p-3 rounded-2xl shadow-xl transition-all flex items-center gap-3 w-full max-w-[220px]">
+                                <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-solar-panel"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Tetto / FV + Accumulo</h4>
+                                    <span class="text-[10px] text-sky-400 block">4.5 kWp + Inverter ibrido</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full bg-sky-500 text-tech-dark flex items-center justify-center text-[10px] font-bold shadow">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technical Room / Main Switchboard (Center) -->
+                        <div class="col-start-2 row-start-2 flex flex-col items-center justify-center">
+                            <div onclick="openNodeDetail('qe')" class="group cursor-pointer bg-tech-dark/90 hover:bg-blue-950/60 border border-blue-500/40 hover:border-blue-400 p-3 rounded-2xl shadow-xl transition-all flex items-center gap-3 w-full max-w-[230px]">
+                                <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Quadro Elettrico (QE)</h4>
+                                    <span class="text-[10px] text-blue-400 block">Sezionatore & Salvavita</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full bg-blue-500 text-tech-dark flex items-center justify-center text-[10px] font-bold shadow">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Salotto / Smart Living (Top Left) -->
+                        <div class="col-start-1 row-start-1 flex flex-col items-center justify-center">
+                            <div onclick="openNodeDetail('salotto')" class="group cursor-pointer bg-tech-dark/90 hover:bg-emerald-950/60 border border-emerald-500/40 hover:border-emerald-400 p-3 rounded-2xl shadow-xl transition-all flex items-center gap-3 w-full max-w-[210px]">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-couch"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Salotto Domotico</h4>
+                                    <span class="text-[10px] text-emerald-400 block">KNX Sensori & Attuatori</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full bg-emerald-500 text-tech-dark flex items-center justify-center text-[10px] font-bold shadow">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cucina / Smart Kitchen (Top Middle-Left) -->
+                        <div class="col-start-1 row-start-2 flex flex-col items-center justify-center">
+                            <div onclick="openNodeDetail('cucina')" class="group cursor-pointer bg-tech-dark/90 hover:bg-purple-950/60 border border-purple-500/40 hover:border-purple-400 p-3 rounded-2xl shadow-xl transition-all flex items-center gap-3 w-full max-w-[210px]">
+                                <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-utensils"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Cucina & Induzione</h4>
+                                    <span class="text-[10px] text-purple-400 block">Gestione carichi prioritari</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full bg-purple-500 text-tech-dark flex items-center justify-center text-[10px] font-bold shadow">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Camera da Letto (Bottom Left) -->
+                        <div class="col-start-1 row-start-3 flex flex-col items-center justify-center">
+                            <div onclick="openNodeDetail('camera')" class="group cursor-pointer bg-tech-dark/90 hover:bg-amber-950/60 border border-amber-500/40 hover:border-amber-400 p-3 rounded-2xl shadow-xl transition-all flex items-center gap-3 w-full max-w-[210px]">
+                                <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-bed"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Camera & Antifurto</h4>
+                                    <span class="text-[10px] text-amber-400 block">Sensori perimetrali</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full bg-amber-500 text-tech-dark flex items-center justify-center text-[10px] font-bold shadow">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bagno & Wellness (Top Right) -->
+                        <div class="col-start-3 row-start-1 flex flex-col items-center justify-center">
+                            <div onclick="openNodeDetail('bagno')" class="group cursor-pointer bg-tech-dark/90 hover:bg-rose-950/60 border border-rose-500/40 hover:border-rose-400 p-3 rounded-2xl shadow-xl transition-all flex items-center gap-3 w-full max-w-[210px]">
+                                <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-bath"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Bagno / Zone Umide</h4>
+                                    <span class="text-[10px] text-rose-400 block">Equipotenziale & IPx4</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full bg-rose-500 text-tech-dark flex items-center justify-center text-[10px] font-bold shadow">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Garage & Colonnina EV (Bottom Right) -->
+                        <div class="col-start-3 row-start-3 flex flex-col items-center justify-center">
+                            <div onclick="openNodeDetail('garage')" class="group cursor-pointer bg-tech-dark/90 hover:bg-sky-950/60 border border-sky-500/40 hover:border-sky-400 p-3 rounded-2xl shadow-xl transition-all flex items-center gap-3 w-full max-w-[210px]">
+                                <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-car-rear"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Garage & Wallbox EV</h4>
+                                    <span class="text-[10px] text-sky-400 block">Ricarica 7.4 kW Smart</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full bg-sky-500 text-tech-dark flex items-center justify-center text-[10px] font-bold shadow">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Legend / Quick Guide footer inside card -->
+                <div class="flex flex-wrap items-center justify-between gap-4 pt-3 text-xs text-slate-400">
+                    <div class="flex items-center gap-4">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle text-sky-400 text-[8px]"></i> Fotovoltaico/EV</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle text-emerald-400 text-[8px]"></i> Domotica KNX</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle text-amber-400 text-[8px]"></i> Antifurto</span>
+                    </div>
+                    <span class="text-slate-500">Normativa di riferimento: CEI 64-8 / V3 (Livello 3)</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Interactive Controls & System Specifications (4 Cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Domotics & Smart Hub Panel -->
+            <div class="bg-tech-card border border-tech-border rounded-3xl p-6 flex flex-col gap-4 shadow-xl">
+                <div class="flex items-center justify-between pb-3 border-b border-tech-border">
+                    <h3 class="font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-network-wired text-purple-400"></i> Pannello Domotico & LAN
+                    </h3>
+                    <span class="text-xs font-mono bg-purple-500/10 text-purple-400 px-2.5 py-1 rounded-lg">Bus KNX / Fibra</span>
+                </div>
+
+                <!-- Interactive Toggles -->
+                <div class="flex flex-col gap-3">
+                    <div class="bg-tech-dark/60 p-3.5 rounded-2xl border border-tech-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
+                                <i class="fa-solid fa-temperature-three-quarters"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-semibold">Termoregolazione Smart</h4>
+                                <span class="text-[10px] text-slate-400">Gestione zonale a zone</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked onchange="toggleSystemState('climate', this.checked)" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="bg-tech-dark/60 p-3.5 rounded-2xl border border-tech-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                                <i class="fa-solid fa-shield-cat"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-semibold">Antifurto & Telecamere</h4>
+                                <span class="text-[10px] text-slate-400">Perimetrale + TVCC IP</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked onchange="toggleSystemState('alarm', this.checked)" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="bg-tech-dark/60 p-3.5 rounded-2xl border border-tech-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
+                                <i class="fa-solid fa-wifi"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-semibold">Rack Dati & Fibra FTTH</h4>
+                                <span class="text-[10px] text-slate-400">Patch Panel & Switch PoE</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked onchange="toggleSystemState('network', this.checked)" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Load Management Status Box -->
+                <div class="bg-gradient-to-br from-indigo-950/40 to-tech-dark p-4 rounded-2xl border border-indigo-500/30">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-gauge-high"></i> Power Management CEI
+                        </span>
+                        <span class="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded">6.0 kW Max</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden mb-2">
+                        <div id="load-progress" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-2.5 rounded-full transition-all duration-500" style="width: 58%;"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-400">
+                        <span>Carico attuale: <strong id="current-load-val" class="text-white">3.48 kW</strong></span>
+                        <span class="text-emerald-400">Stabile (Dispaccio OK)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access / Info Card -->
+            <div class="bg-tech-card border border-tech-border rounded-3xl p-6 flex flex-col gap-3 shadow-xl">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-book-bookmark text-sky-400"></i> Specifiche Livello 3 (CEI 64-8)
+                </h3>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Il Livello 3 rappresenta il massimo standard residenziale italiano. Include obbligatoriamente:
+                </p>
+                <ul class="text-xs text-slate-400 flex flex-col gap-2 pl-2">
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-sky-400 mt-0.5"></i>
+                        <span><strong>Domotica Avanzata:</strong> Gestione carichi, luci, clima, scenari e controllo remoto.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                        <span><strong>Fotovoltaico & Accumulo:</strong> Integrazione solare con scambio sul posto e batteria litio.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-amber-400 mt-0.5"></i>
+                        <span><strong>Antifurto & TVCC:</strong> Protezione perimetrale e videosorveglianza integrata.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-purple-400 mt-0.5"></i>
+                        <span><strong>Cablaggio Strutturato:</strong> Fibra ottica FTTH, prese RJ45 in ogni stanza e rack multimediale.</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Detailed Technical Modal Component -->
+    <div id="tech-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-tech-card border border-tech-border rounded-3xl max-w-xl w-full p-6 shadow-2xl relative transform transition-all flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-900/50 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="flex items-center gap-3 pb-3 border-b border-tech-border">
+                <div id="modal-icon" class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h3 id="modal-title" class="font-bold text-lg text-white">Titolo Componente</h3>
+                    <span id="modal-subtitle" class="text-xs text-sky-400 font-mono">Codice Normativo / Categoria</span>
+                </div>
+            </div>
+
+            <div id="modal-body" class="text-sm text-slate-300 space-y-3 leading-relaxed">
+                <!-- Dynamic Content inserted via JS -->
+            </div>
+
+            <div class="pt-3 border-t border-tech-border flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-tech-dark font-bold text-xs rounded-xl transition-all shadow-lg">
+                    Chiudi Dettagli
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulation & Load Control Modal -->
+    <div id="sim-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-tech-card border border-tech-border rounded-3xl max-w-xl w-full p-6 shadow-2xl relative transform transition-all flex flex-col gap-4">
+            <button onclick="closeSimulationModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-900/50 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 pb-3 border-b border-tech-border">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-white">Simulatore Energetico in Tempo Reale</h3>
+                    <span class="text-xs text-indigo-400 font-mono">Attiva i carichi e verifica i flussi fotovoltaici</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+                <div class="bg-tech-dark/60 p-4 rounded-2xl border border-tech-border flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-white">Cucina ad Induzione</h4>
+                        <span class="text-[10px] text-slate-400">Assorbimento: 3.0 kW</span>
+                    </div>
+                    <button onclick="toggleLoad('induzione', 3.0, this)" id="btn-induzione" class="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl transition-all">Attiva</button>
+                </div>
+
+                <div class="bg-tech-dark/60 p-4 rounded-2xl border border-tech-border flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-white">Wallbox Ricarica EV</h4>
+                        <span class="text-[10px] text-slate-400">Assorbimento: 7.4 kW</span>
+                    </div>
+                    <button onclick="toggleLoad('ev', 7.4, this)" id="btn-ev" class="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl transition-all">Attiva</button>
+                </div>
+
+                <div class="bg-tech-dark/60 p-4 rounded-2xl border border-tech-border flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-white">Pompa di Calore Clima</h4>
+                        <span class="text-[10px] text-slate-400">Assorbimento: 1.5 kW</span>
+                    </div>
+                    <button onclick="toggleLoad('clima', 1.5, this)" id="btn-clima" class="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl transition-all">Attiva</button>
+                </div>
+
+                <div class="bg-tech-dark/60 p-4 rounded-2xl border border-tech-border flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-white">Forno Elettrico</h4>
+                        <span class="text-[10px] text-slate-400">Assorbimento: 2.2 kW</span>
+                    </div>
+                    <button onclick="toggleLoad('forno', 2.2, this)" id="btn-forno" class="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl transition-all">Attiva</button>
+                </div>
+            </div>
+
+            <div class="bg-indigo-950/20 p-4 rounded-2xl border border-indigo-500/20 flex flex-col gap-2">
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-400">Carico Totale Attivo:</span>
+                    <span id="sim-total-load" class="font-mono font-bold text-white">3.48 kW</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-400">Copertura Fotovoltaico + Accumulo:</span>
+                    <span class="font-mono font-bold text-emerald-400">100% (Zero Prelievo Rete)</span>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeSimulationModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg">
+                    Salva & Chiudi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guided Student Tour Overlay Modal -->
+    <div id="tour-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-tech-card border border-tech-border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative flex flex-col gap-4">
+            <div class="flex items-center justify-between pb-3 border-b border-tech-border">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs" id="tour-step-badge">1/5</span>
+                    <h3 id="tour-title" class="font-bold text-base text-white">Benvenuto al Tour Guidato Livello 3</h3>
+                </div>
+                <button onclick="endTour()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i> Esci</button>
+            </div>
+
+            <div id="tour-content" class="text-sm text-slate-300 leading-relaxed min-h-[100px]">
+                Benvenuto studente! Questo percorso interattivo ti guiderà alla scoperta dei segreti di un impianto elettrico residenziale di Livello 3 secondo la normativa CEI 64-8. Clicca su "Avanti" per iniziare.
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-tech-border">
+                <button onclick="prevTourStep()" id="tour-prev-btn" class="px-4 py-2 bg-slate-800 text-slate-400 hover:text-white text-xs rounded-xl transition-all disabled:opacity-40" disabled>Indietro</button>
+                <button onclick="nextTourStep()" id="tour-next-btn" class="px-5 py-2 bg-sky-500 hover:bg-sky-400 text-tech-dark font-bold text-xs rounded-xl transition-all shadow-lg">Avanti</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Database of technical specifications for each node
+        const nodeDetails = {
+            pv: {
+                title: "Impianto Fotovoltaico & Accumulo",
+                subtitle: "Generazione Rinnovabile & Storage Litio",
+                icon: "fa-solar-panel",
+                body: `
+                    <p><strong>Configurazione Tecnica:</strong> Impianto da 4.5 kWp composto da moduli monocristallini ad alta efficienza abbinato a Inverter ibrido e batteria di accumulo al litio da 10 kWh.</p>
+                    <p><strong>Funzionamento:</strong> Durante le ore diurne, l'energia solare alimenta i carichi domestici prioritari (pompa di calore, elettrodomestici) e ricarica l'accumulo. L'energia in eccesso viene immessa in rete o gestita per la ricarica programmata del veicolo elettrico.</p>
+                    <p><strong>Normativa CEI 64-8:</strong> Presenza di dispositivi di sezionamento dedicati, protezione contro le sovratensioni (scaricatori SPD tipo 2) sia sul lato DC (inverter) che AC.</p>
+                `
+            },
+            qe: {
+                title: "Quadro Elettrico Principale (QE)",
+                subtitle: "Centro di Distribuzione & Protezione",
+                icon: "fa-bolt",
+                body: `
+                    <p><strong>Configurazione Tecnica:</strong> Quadro da incasso IP40 con almeno 36 moduli suddiviso per zone. Include sezionatore generale, interruttori differenziali (salvavita) ad alta immunità e magnetotermici coordinati.</p>
+                    <p><strong>Gestione Carichi:</strong> Grazie alla domotica integrata, il QE monitora in tempo reale i consumi totali staccando i carichi non prioritari in caso di superamento della soglia contrattuale (es. 6 kW).</p>
+                    <p><strong>Normativa CEI 64-8:</strong> Rispetto rigoroso degli spazi di riserva (minimo 30% liberi) e selettività delle protezioni.</p>
+                `
+            },
+            salotto: {
+                title: "Salotto Smart (Domotica KNX / IoT)",
+                subtitle: "Automazione Illuminazione & Clima",
+                icon: "fa-couch",
+                body: `
+                    <p><strong>Configurazione Tecnica:</strong> Nodo domotico decentralizzato basato su bus KNX o protocollo IoT protetto. Include attuatori per tapparelle motorizzate, dimmer per luci LED a variazione di colore e termostato ambiente zonale.</p>
+                    <p><strong>Comfort & Risparmio:</strong> I sensori di presenza e luminosità regolano automaticamente l'illuminazione naturale e artificiale, riducendo gli sprechi energetici.</p>
+                `
+            },
+            cucina: {
+                title: "Cucina & Gestione Carichi Potenti",
+                subtitle: "Piano ad Induzione & Linee Dedicate",
+                icon: "fa-utensils",
+                body: `
+                    <p><strong>Configurazione Tecnica:</strong> Linea dedicata di sezione maggiorata (6 mm²) protetta da magnetotermico da 32A per il piano cottura ad induzione e forno elettrico.</p>
+                    <p><strong>Sicurezza:</strong> Intervento prioritario del sistema di energy management per evitare il distacco intempestivo del contatore enel durante l'uso contemporaneo di lavastoviglie e induzione.</p>
+                `
+            },
+            camera: {
+                title: "Camera da Letto & Antifurto Perimetrale",
+                subtitle: "Sicurezza Notturna & Prese Dati",
+                icon: "fa-bed",
+                body: `
+                    <p><strong>Configurazione Tecnica:</strong> Presenza di punti presa RJ45 schermati (categoria 6A) per smart TV e terminali, oltre ai contatti magnetici per finestre e sensori volumetrici a doppia tecnologia.</p>
+                    <p><strong>Comfort:</strong> Comandi tapparelle centralizzati "Notte" per chiusura simultanea di tutta la casa con un solo tocco.</p>
+                `
+            },
+            bagno: {
+                title: "Bagno & Zone Umide protette",
+                subtitle: "Equipotenzialità & Protezione IP",
+                icon: "fa-bath",
+                body: `
+                    <p><strong>Configurazione Tecnica:</strong> Nodo equipotenziale supplementare che collega tutte le masse estranee (tubazioni metalliche dell'acqua, termosifoni) al conduttore di protezione.</p>
+                    <p><strong>Normativa CEI 64-8 (Sez. 701):</strong> Presidi di sicurezza con differenziale dedicato da 30mA e rispetto delle distanze di rispetto per punti presa rispetto a vasche e docce.</p>
+                `
+            },
+            garage: {
+                title: "Garage & Wallbox Ricarica EV",
+                subtitle: "Mobilità Elettrica 7.4 kW",
+                icon: "fa-car-rear",
+                body: `
+                    <p><strong>Configurazione Tecnica:</strong> Wallbox di ricarica in Modo 3 con potenza fino a 7.4 kW (monofase 32A) dotata di misuratore di energia MID e controllo dinamico del carico domestico (Dynamic Power Management).</p>
+                    <p><strong>Integrazione:</strong> La colonnina sfrutta l'energia in eccesso dell'impianto fotovoltaico per ricaricare l'auto elettrica a costo quasi zero.</p>
+                `
+            }
+        };
+
+        // Modal Controls
+        function openNodeDetail(nodeKey) {
+            const data = nodeDetails[nodeKey];
+            if (!data) return;
+
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-subtitle').innerText = data.subtitle;
+            document.getElementById('modal-body').innerHTML = data.body;
+            document.getElementById('modal-icon').innerHTML = `<i class="fa-solid ${data.icon}"></i>`;
+
+            const modal = document.getElementById('tech-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('tech-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // Simulation Modal Controls
+        function openSimulationModal() {
+            const modal = document.getElementById('sim-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSimulationModal() {
+            const modal = document.getElementById('sim-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // Load Toggle Simulation
+        let activeLoads = { induzione: false, ev: true, clima: false, forno: false };
+        function toggleLoad(loadName, powerKw, btnElement) {
+            activeLoads[loadName] = !activeLoads[loadName];
+            
+            if (activeLoads[loadName]) {
+                btnElement.classList.remove('bg-slate-800', 'text-slate-300');
+                btnElement.classList.add('bg-sky-500', 'text-tech-dark', 'font-bold');
+                btnElement.innerText = 'Acceso';
+            } else {
+                btnElement.classList.remove('bg-sky-500', 'text-tech-dark', 'font-bold');
+                btnElement.classList.add('bg-slate-800', 'text-slate-300');
+                btnElement.innerText = 'Attiva';
+            }
+
+            // Recalculate total load
+            let base = 1.2; // base household load
+            if (activeLoads.induzione) base += 3.0;
+            if (activeLoads.ev) base += 7.4;
+            if (activeLoads.clima) base += 1.5;
+            if (activeLoads.forno) base += 2.2;
+
+            document.getElementById('sim-total-load').innerText = base.toFixed(2) + ' kW';
+            document.getElementById('current-load-val').innerText = base.toFixed(2) + ' kW';
+            
+            let pct = Math.min(Math.round((base / 10.0) * 100), 100);
+            document.getElementById('load-progress').style.width = pct + '%';
+        }
+
+        // System Toggles
+        function toggleSystemState(systemType, isActive) {
+            if (systemType === 'alarm') {
+                document.getElementById('metric-alarm').innerText = isActive ? 'Inserito Totale' : 'Disinserito';
+                document.getElementById('metric-alarm').className = isActive ? 'text-sm font-bold font-mono text-amber-400' : 'text-sm font-bold font-mono text-slate-400';
+            } else if (systemType === 'climate') {
+                // notification feedback can be added here
+            }
+        }
+
+        function resetAllSystems() {
+            location.reload();
+        }
+
+        // Guided Tour State Machine
+        const tourSteps = [
+            {
+                title: "Benvenuto al Tour Guidato Livello 3",
+                content: "Esploreremo insieme un impianto elettrico residenziale di altissimo livello secondo la norma CEI 64-8. Clicca su Avanti per iniziare dal Quadro Elettrico."
+            },
+            {
+                title: "1. Il Quadro Elettrico Principale (QE)",
+                content: "Il cuore dell'abitazione: gestisce i differenziali, i magnetotermici zonali e integra i moduli di controllo domotico per la gestione automatica dei carichi."
+            },
+            {
+                title: "2. Fotovoltaico & Accumulo",
+                content: "I pannelli sul tetto generano energia pulita accumulata nelle batterie al litio. In questo modo la casa è autonoma anche durante le ore serali."
+            },
+            {
+                title: "3. Wallbox & Mobilità Elettrica",
+                content: "Nel garage troviamo la colonnina EV da 7.4 kW dotata di Power Management per ricaricare l'auto senza far scattare il contatore generale."
+            },
+            {
+                title: "4. Domotica KNX & Sicurezza",
+                content: "Sensori climatici, antifurto perimetrale e rete in fibra ottica completano il Livello 3, garantendo massimo comfort, risparmio energetico e sicurezza totale."
+            }
+        ];
+        let currentTourStep = 0;
+
+        function startTour() {
+            currentTourStep = 0;
+            updateTourModal();
+            const modal = document.getElementById('tour-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function endTour() {
+            const modal = document.getElementById('tour-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function nextTourStep() {
+            if (currentTourStep < tourSteps.length - 1) {
+                currentTourStep++;
+                updateTourModal();
+            } else {
+                endTour();
+            }
+        }
+
+        function prevTourStep() {
+            if (currentTourStep > 0) {
+                currentTourStep--;
+                updateTourModal();
+            }
+        }
+
+        function updateTourModal() {
+            const step = tourSteps[currentTourStep];
+            document.getElementById('tour-step-badge').innerText = `${currentTourStep + 1}/${tourSteps.length}`;
+            document.getElementById('tour-title').innerText = step.title;
+            document.getElementById('tour-content').innerText = step.content;
+
+            document.getElementById('tour-prev-btn').disabled = currentTourStep === 0;
+            document.getElementById('tour-next-btn').innerText = currentTourStep === tourSteps.length - 1 ? 'Termina Tour' : 'Avanti';
+        }
+    </script>
+</body>
+</html>

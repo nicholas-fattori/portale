@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impianto Elettrico Residenziale - CEI 64-8 Livello 1 & Messa a Terra</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tech: {
+                            dark: '#060911',
+                            card: '#0F172A',
+                            panel: '#1E293B',
+                            border: '#334155',
+                            accent: '#38BDF8',
+                            emerald: '#10B981',
+                            amber: '#F59E0B',
+                            rose: '#F43F5E',
+                            purple: '#A855F7',
+                            phase: '#EF4444',     /* Fase Rosso */
+                            neutral: '#3B82F6',   /* Neutro Blu */
+                            earth: '#EAB308',     /* Terra Giallo-Verde */
+                            lightLine: '#C084FC', /* Linea Luci Viola */
+                            dirt: '#271B12',      /* Terreno per Pozzetto */
+                            copper: '#D97706'     /* Rame / Picchetto */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #060911; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Flowing energy animation on wires */
+        @keyframes energyFlow {
+            0% { stroke-dashoffset: 24; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .flow-active {
+            stroke-dasharray: 8, 8;
+            animation: energyFlow 0.8s linear infinite;
+        }
+        .flow-earth-active {
+            stroke-dasharray: 10, 6;
+            animation: energyFlow 0.5s linear infinite;
+        }
+        
+        /* Discharge wave effect into ground */
+        @keyframes earthDischarge {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 0.9; transform: scale(1.3); }
+            100% { opacity: 0; transform: scale(1.8); }
+        }
+        .discharge-wave {
+            animation: earthDischarge 1.2s ease-out infinite;
+        }
+
+        /* Pulsing Glows */
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.4)); }
+            50% { filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.9)); }
+        }
+        .glow-node { animation: pulseGlow 2.5s infinite ease-in-out; }
+
+        @keyframes faultPulse {
+            0%, 100% { filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.6)); }
+            50% { filter: drop-shadow(0 0 20px rgba(244, 63, 94, 1)); }
+        }
+        .glow-fault { animation: faultPulse 0.8s infinite ease-in-out; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #060911; }
+        ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38BDF8; }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
+
+    <header class="sticky top-0 z-40 bg-tech-dark/95 backdrop-blur-md border-b border-tech-border px-4 lg:px-8 py-3.5 shadow-2xl">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-emerald-500 to-sky-500 flex items-center justify-center text-tech-dark font-black text-xl shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-earth-europe"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg lg:text-xl tracking-tight bg-gradient-to-r from-amber-400 via-emerald-300 to-sky-400 bg-clip-text text-transparent flex items-center gap-2">
+                        Impianto Elettrico Residenziale
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 font-semibold">CEI 64-8 • Messa a Terra & Livello 1</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium">Laboratorio Didattico Interattivo • Pozzetto di Terra, Dispersore, PE & Protezioni</p>
+                </div>
+            </div>
+
+            <!-- Top Action Buttons -->
+            <div class="flex items-center flex-wrap gap-2">
+                <button onclick="startTour()" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-400 hover:to-emerald-500 text-tech-dark font-black text-xs rounded-xl shadow-lg shadow-amber-500/15 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-sm"></i> Tour Didattico
+                </button>
+                <button onclick="openFaultSimulator()" class="px-3.5 py-2 bg-tech-card hover:bg-slate-800 border border-amber-500/40 text-amber-400 font-bold text-xs rounded-xl transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-sm"></i> Simula Dispersione
+                </button>
+                <button onclick="openNormsModal()" class="px-3.5 py-2 bg-tech-card hover:bg-slate-800 border border-tech-border text-slate-300 font-bold text-xs rounded-xl transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-table text-sm"></i> Normativa CEI 64-8
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: Floorplan & Subterranean Earthing System Blueprint (8 Cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+
+            <!-- Telemetry & Grounding Status Metrics Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-tech-card border border-tech-border rounded-2xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-earth-europe"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 font-medium block">Resistenza di Terra (R_T)</span>
+                        <span id="telemetry-rt" class="text-xs font-bold font-mono text-emerald-400">12.4 &Omega; (Conforme &le;50&Omega;)</span>
+                    </div>
+                </div>
+
+                <div class="bg-tech-card border border-tech-border rounded-2xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 font-medium block">Tensione Limite U_L</span>
+                        <span id="telemetry-ul" class="text-xs font-bold font-mono text-purple-300">&le; 50V AC (CEI 64-8)</span>
+                    </div>
+                </div>
+
+                <div class="bg-tech-card border border-tech-border rounded-2xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-plug"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 font-medium block">Linea Prese (C16)</span>
+                        <span id="telemetry-prese" class="text-xs font-bold font-mono text-emerald-400">230V • 2.5mm² (OK)</span>
+                    </div>
+                </div>
+
+                <div class="bg-tech-card border border-tech-border rounded-2xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-wave-square"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 font-medium block">Protezione RCD</span>
+                        <span id="telemetry-rcd" class="text-xs font-bold font-mono text-emerald-400">I&Delta;n = 30mA (Attivo)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-tech-card border border-tech-border rounded-3xl p-4 sm:p-5 flex flex-col shadow-2xl relative">
+                
+                <!-- Blueprint Card Header -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b border-tech-border gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-diagram-project text-amber-400"></i>
+                            Planimetria Impianto & Sistema Subterraneo Messa a Terra
+                        </h2>
+                        <p class="text-xs text-slate-400">Schema di cablaggio integrato con nodo equipotenziale EQPT, pozzetto d'ispezione e dispersore nel terreno.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-mono bg-slate-800 text-amber-400 px-2.5 py-1 rounded-lg border border-amber-500/30">
+                            Conduttore PE: Giallo-Verde (6/10 mm²)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Interactive Blueprint Container -->
+                <div class="relative w-full aspect-[16/11] my-4 bg-[#050811] rounded-2xl border border-slate-800 overflow-hidden shadow-inner">
+                    
+                    <!-- Background Blueprint Grid -->
+                    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-20"></div>
+
+                    <!-- Room Overlay Zone Headers -->
+                    <div class="absolute inset-0 grid grid-cols-3 grid-rows-3 p-4 pointer-events-none text-[9px] font-mono uppercase tracking-widest text-slate-600 font-bold">
+                        <div class="border-r border-b border-slate-800/60 p-2">ZONA 01: SOGGIORNO</div>
+                        <div class="border-r border-b border-slate-800/60 p-2">ZONA 02: INGRESSO / DERIVAZIONE</div>
+                        <div class="border-b border-slate-800/60 p-2">ZONA 03: BAGNO (VOLUME 2/3)</div>
+                        <div class="border-r border-b border-slate-800/60 p-2 flex items-end">ZONA 04: CUCINA & CARICHI</div>
+                        <div class="border-r border-b border-slate-800/60 p-2 flex items-end">ZONA 05: QUADRO & NODO EQPT</div>
+                        <div class="border-b border-slate-800/60 p-2 flex items-end">ZONA 06: CAMERA DA LETTO</div>
+                        
+                        <!-- Subterranean Earth Layer Banner at Bottom -->
+                        <div class="col-span-3 bg-gradient-to-b from-tech-dark via-[#1a110a] to-[#271b12] border-t-2 border-amber-800/60 p-2 flex justify-between items-start text-amber-600">
+                            <span class="flex items-center gap-1.5 font-bold"><i class="fa-solid fa-layer-group"></i> STRATO SUBTERRANEO (TERRENO NATURALE)</span>
+                            <span class="text-[9px] text-amber-500/80">POZZETTO DI ISPEZIONE & PICCHETTO DISPERSORE DI TERRA</span>
+                        </div>
+                    </div>
+
+                    <!-- SVG Wiring & Vector Ground Connections (ViewBox 1000 x 680) -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1000 680" preserveAspectRatio="none">
+                        <defs>
+                            <!-- Glow Filter for Active Earth Discharge -->
+                            <filter id="glow-earth" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="4" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+
+                        <!-- FEEDER LINE FROM METER TO QUADRO -->
+                        <path id="wire-main" d="M 500 600 L 500 370" stroke="#10B981" stroke-width="4" fill="none" class="flow-active" />
+
+                        <!-- POWER LINES PRESE 2.5mm² (Sky Blue) -->
+                        <path id="wire-power-kitchen" d="M 480 370 L 170 370 L 170 300" stroke="#38BDF8" stroke-width="3" fill="none" class="flow-active" />
+                        <path id="wire-power-living" d="M 480 370 L 170 370 L 170 140" stroke="#38BDF8" stroke-width="3" fill="none" class="flow-active" />
+                        <path id="wire-power-bed" d="M 520 370 L 830 370 L 830 300" stroke="#38BDF8" stroke-width="3" fill="none" class="flow-active" />
+                        <path id="wire-power-bath" d="M 520 370 L 830 370 L 830 140" stroke="#38BDF8" stroke-width="3" fill="none" class="flow-active" />
+
+                        <!-- LIGHTING LINES 1.5mm² (Purple) -->
+                        <path id="wire-light-hall" d="M 500 370 L 500 140" stroke="#C084FC" stroke-width="2.5" stroke-dasharray="4,4" fill="none" class="flow-active" />
+                        <path id="wire-light-living" d="M 500 140 L 170 140" stroke="#C084FC" stroke-width="2.5" stroke-dasharray="4,4" fill="none" />
+                        <path id="wire-light-bath" d="M 500 140 L 830 140" stroke="#C084FC" stroke-width="2.5" stroke-dasharray="4,4" fill="none" />
+
+                        <!-- EARTH GROUND SYSTEM (PE - Giallo/Verde #EAB308) -->
+                        <!-- Room PE Collectors down to EQPT Terminal (Node Quadro) -->
+                        <path id="wire-pe-living" d="M 170 140 L 170 390 L 480 390" stroke="#EAB308" stroke-width="2.5" stroke-dasharray="8,4" fill="none" />
+                        <path id="wire-pe-kitchen" d="M 170 300 L 170 390 L 480 390" stroke="#EAB308" stroke-width="2.5" stroke-dasharray="8,4" fill="none" />
+                        <path id="wire-pe-bath" d="M 830 140 L 830 390 L 520 390" stroke="#EAB308" stroke-width="2.5" stroke-dasharray="8,4" fill="none" />
+                        <path id="wire-pe-bed" d="M 830 300 L 830 390 L 520 390" stroke="#EAB308" stroke-width="2.5" stroke-dasharray="8,4" fill="none" />
+
+                        <!-- MAIN PE EARTH CONDUCTOR (From EQPT Node down to Inspection Pit Earth Rod) -->
+                        <path id="wire-pe-main" d="M 500 410 L 500 585 L 300 585 L 300 620" stroke="#EAB308" stroke-width="5" stroke-dasharray="8,4" fill="none" class="flow-earth-active" filter="url(#glow-earth)" />
+
+                        <!-- PIPELINE EQUipotential EQP CONDUIT (Tubazione Metallica Acqua -> EQPT) -->
+                        <path id="wire-eqp-pipe" d="M 830 180 L 880 180 L 880 390 L 520 390" stroke="#06B6D4" stroke-width="2" stroke-dasharray="4,4" fill="none" />
+
+                        <!-- Junction Points -->
+                        <circle cx="500" cy="370" r="5" fill="#38BDF8" />
+                        <circle cx="500" cy="140" r="5" fill="#C084FC" />
+                        <circle cx="500" cy="390" r="6" fill="#EAB308" class="animate-ping" />
+                        <circle cx="500" cy="390" r="6" fill="#EAB308" />
+                        <circle cx="300" cy="585" r="5" fill="#D97706" />
+                    </svg>
+
+                    <!-- Interactive Terminal Nodes HTML Overlay -->
+                    <div class="absolute inset-0 pointer-events-auto">
+
+                        <!-- NODE 1: SOGGIORNO (Top-Left) -->
+                        <div style="top: 18%; left: 6%;" class="absolute transform -translate-y-1/2">
+                            <div onclick="openNodeDetail('soggiorno')" id="node-soggiorno" class="group cursor-pointer bg-tech-card/90 hover:bg-slate-800 border border-purple-500/50 hover:border-purple-400 p-2.5 rounded-2xl shadow-xl backdrop-blur-md transition-all flex items-center gap-2.5 w-48 glow-node">
+                                <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-tv"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Soggiorno</h4>
+                                    <span class="text-[10px] text-purple-400 font-mono block">Prese + PE Terra</span>
+                                </div>
+                                <i class="fa-solid fa-circle-info text-slate-500 group-hover:text-purple-400 text-xs"></i>
+                            </div>
+                        </div>
+
+                        <!-- NODE 2: INGRESSO / DERIVAZIONE (Top-Center) -->
+                        <div style="top: 18%; left: 39%;" class="absolute transform -translate-y-1/2">
+                            <div onclick="openNodeDetail('ingresso')" id="node-ingresso" class="group cursor-pointer bg-tech-card/90 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 p-2.5 rounded-2xl shadow-xl backdrop-blur-md transition-all flex items-center gap-2.5 w-48">
+                                <div class="w-8 h-8 rounded-xl bg-slate-700/40 text-slate-300 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-box-open"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Scatola Derivazione</h4>
+                                    <span class="text-[10px] text-slate-400 font-mono block">Morsetti C10/C16</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NODE 3: BAGNO ZONA UMIDA (Top-Right) -->
+                        <div style="top: 18%; left: 70%;" class="absolute transform -translate-y-1/2">
+                            <div onclick="openNodeDetail('bagno')" id="node-bagno" class="group cursor-pointer bg-tech-card/90 hover:bg-slate-800 border border-rose-500/50 hover:border-rose-400 p-2.5 rounded-2xl shadow-xl backdrop-blur-md transition-all flex items-center gap-2.5 w-48">
+                                <div class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-shower"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Bagno (Volumi 0-3)</h4>
+                                    <span class="text-[10px] text-rose-400 font-mono block">Protezione RCD 30mA</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NODE 4: CUCINA & CARICHI (Mid-Left) -->
+                        <div style="top: 42%; left: 6%;" class="absolute transform -translate-y-1/2">
+                            <div onclick="openNodeDetail('cucina')" id="node-cucina" class="group cursor-pointer bg-tech-card/90 hover:bg-slate-800 border border-sky-500/50 hover:border-sky-400 p-2.5 rounded-2xl shadow-xl backdrop-blur-md transition-all flex items-center gap-2.5 w-48">
+                                <div class="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-utensils"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Cucina / Forza</h4>
+                                    <span class="text-[10px] text-sky-400 font-mono block">Elettrodomestici 16A</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NODE 5: QUADRO ELETTRICO + NODO EQPT (Mid-Center) -->
+                        <div style="top: 50%; left: 38%;" class="absolute transform -translate-y-1/2">
+                            <div onclick="openNodeDetail('quadro')" id="node-quadro" class="group cursor-pointer bg-slate-900 border-2 border-emerald-500 hover:border-emerald-400 p-3 rounded-2xl shadow-2xl backdrop-blur-md transition-all flex items-center gap-3 w-56 ring-4 ring-emerald-500/10">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-base group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-box-archive"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-extrabold text-white truncate">Quadro + Collettore EQPT</h4>
+                                    <span class="text-[10px] text-amber-400 font-mono font-bold block">Nodo Principale Terra</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NODE 6: CAMERA DA LETTO (Mid-Right) -->
+                        <div style="top: 42%; left: 70%;" class="absolute transform -translate-y-1/2">
+                            <div onclick="openNodeDetail('camera')" id="node-camera" class="group cursor-pointer bg-tech-card/90 hover:bg-slate-800 border border-amber-500/50 hover:border-amber-400 p-2.5 rounded-2xl shadow-xl backdrop-blur-md transition-all flex items-center gap-2.5 w-48">
+                                <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-bed"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Camera da Letto</h4>
+                                    <span class="text-[10px] text-amber-400 font-mono block">Deviatori & Prese</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NODE 7: POZZETTO ISPEZIONE & PICCHETTO TERRA SUBTERRANEO (Bottom-Left) -->
+                        <div style="top: 86%; left: 18%;" class="absolute transform -translate-y-1/2">
+                            <div onclick="openNodeDetail('pozzetto')" id="node-pozzetto" class="group cursor-pointer bg-[#1e130b] hover:bg-[#2a1a0e] border-2 border-amber-500 p-3 rounded-2xl shadow-2xl backdrop-blur-md transition-all flex items-center gap-3 w-64 ring-4 ring-amber-500/20">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-arrow-down-long animate-bounce"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-extrabold text-amber-300 truncate">Pozzetto & Dispersore Terra</h4>
+                                    <span class="text-[10px] text-amber-400/90 font-mono font-bold block">Picchetto Rame • R_T &lt; 50&Omega;</span>
+                                </div>
+                                <i class="fa-solid fa-circle-info text-amber-400 text-xs"></i>
+                            </div>
+                        </div>
+
+                        <!-- NODE 8: CONNESSIO EQP TUBAZIONI ACQUA/GAS (Bottom-Right) -->
+                        <div style="top: 86%; left: 62%;" class="absolute transform -translate-y-1/2">
+                            <div onclick="openNodeDetail('eqp')" id="node-eqp" class="group cursor-pointer bg-tech-card/90 hover:bg-slate-800 border border-cyan-500/50 hover:border-cyan-400 p-2.5 rounded-2xl shadow-xl backdrop-blur-md transition-all flex items-center gap-2.5 w-60">
+                                <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-faucet-drip"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-white truncate">Equipotenziale EQP Tubazioni</h4>
+                                    <span class="text-[10px] text-cyan-400 font-mono block">Massa Estranea Acqua/Gas</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Wiring Legend Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs text-slate-400 border-t border-tech-border">
+                    <div class="flex flex-wrap items-center gap-4 text-[11px]">
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-amber-400 rounded-full"></span> Conduttore PE (Terra Giallo-Verde)</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-sky-400 rounded-full"></span> Prese (2.5 mm² - C16)</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-purple-400 rounded-full"></span> Luci (1.5 mm² - C10)</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-cyan-400 rounded-full"></span> Collegamento EQP Tubi</span>
+                    </div>
+                    <span class="text-[11px] font-mono text-slate-500">CEI 64-8 Art. 411.3 • Messa a Terra Obbligatoria</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Grounding Theory & Coordination Card -->
+                <div class="bg-tech-card border border-tech-border rounded-3xl p-5 flex flex-col gap-3 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-tech-border pb-3">
+                        <h3 class="font-bold text-sm text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> Coordinamento Terra & Differenziale
+                        </h3>
+                        <span class="text-[10px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded">
+                            U_L &le; 50V AC
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        La protezione contro i contatti indiretti si basa sul coordinamento tra l'<strong>Interruttore Differenziale ($I_{\Delta n}$)</strong> e la <strong>Resistenza dell'Impianto di Terra ($R_T$)</strong>:
+                    </p>
+                    <div class="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl text-center font-mono text-xs text-amber-300">
+                        R_T &times; I_&Delta;n &le; U_L &nbsp;&rarr;&nbsp; R_T &times; 0.03A &le; 50V &nbsp;&rarr;&nbsp; R_T &le; 1666 &Omega;
+                    </div>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        Nonostante il valore limite teorico sia $1666\,\Omega$, la CEI 64-8 raccomanda per le abitazioni valori di $R_T < 20\,\Omega \text{ o } 50\,\Omega$ per garantire interventi ultra-rapidi ed evitare tensioni residue pericolose sugli elettrodomestici.
+                    </p>
+                </div>
+
+                <!-- Ground Discharge Path Card -->
+                <div class="bg-tech-card border border-tech-border rounded-3xl p-5 flex flex-col gap-3 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-tech-border pb-3">
+                        <h3 class="font-bold text-sm text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-route"></i> Percorso della Corrente di Dispersione
+                        </h3>
+                        <span class="text-[10px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded">
+                            Anello di Guasto
+                        </span>
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                        <li class="flex items-start gap-2">
+                            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold text-[10px] flex items-center justify-center shrink-0">1</span>
+                            <span><strong>Guasto d'Isolante:</strong> La Fase tocca la carcassa metallica dell'elettrodomestico.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
+                            <span><strong>Deflusso PE:</strong> La corrente di guasto fluisce nel cavo Giallo-Verde verso il nodo EQPT del quadro.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
+                            <span><strong>Dispersione Subterranea:</strong> Raggiunge il pozzetto ed il picchetto di rame scaricandosi nel terreno verso il centro stella della cabina MT/BT.</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Interactive Circuit Breakers Panel & Live Simulator Controls (4 Cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+
+            <div class="bg-tech-card border border-tech-border rounded-3xl p-5 flex flex-col gap-4 shadow-xl">
+                <div class="flex items-center justify-between pb-3 border-b border-tech-border">
+                    <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-emerald-400"></i>
+                        Quadro Modulare Attivo DIN
+                    </h3>
+                    <span class="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">
+                        Riserva 30% OK
+                    </span>
+                </div>
+
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Aziona o disattiva gli interruttori per osservare l'impatto sul flusso di corrente e sulla sicurezza dell'impianto domestico.
+                </p>
+
+                <!-- Breakers Stack Container -->
+                <div class="flex flex-col gap-2.5">
+                    
+                    <!-- MAIN GENERAL BREAKER (C32) -->
+                    <div class="bg-tech-panel p-3 rounded-2xl border border-tech-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono font-bold text-xs">
+                                C32
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Generale di Appartamento</h4>
+                                <span class="text-[10px] text-slate-400 font-mono block">Magnetotermico C32 • 6kA</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleSwitch('main')" id="btn-switch-main" class="px-3 py-1.5 bg-emerald-500 text-tech-dark font-extrabold text-xs rounded-xl shadow transition-all">
+                            ON
+                        </button>
+                    </div>
+
+                    <!-- SPD SURGE PROTECTOR -->
+                    <div class="bg-tech-panel p-3 rounded-2xl border border-tech-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono font-bold text-xs">
+                                SPD
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Scaricatore Sovratensione</h4>
+                                <span class="text-[10px] text-slate-400 font-mono block">Tipo 2 • Scarico a Terra</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Ok</span>
+                    </div>
+
+                    <!-- DIFFERENTIAL RCD (SALVAVITA) -->
+                    <div class="bg-tech-panel p-3 rounded-2xl border border-tech-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-mono font-bold text-xs">
+                                RCD
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Interruttore Differenziale</h4>
+                                <span class="text-[10px] text-slate-400 font-mono block">Tipo A / F • I&Delta;n 30mA</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="testRCD()" class="px-2 py-1 bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-tech-dark font-bold text-[10px] rounded-lg transition-all" title="Tasto di Prova Differenziale">
+                                TEST
+                            </button>
+                            <button onclick="toggleSwitch('rcd')" id="btn-switch-rcd" class="px-3 py-1.5 bg-emerald-500 text-tech-dark font-extrabold text-xs rounded-xl shadow transition-all">
+                                ON
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- MCB POWER PRESE (C16) -->
+                    <div class="bg-tech-panel p-3 rounded-2xl border border-tech-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-mono font-bold text-xs">
+                                C16
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Linea Prese Generali</h4>
+                                <span class="text-[10px] text-slate-400 font-mono block">Magnetotermico 16A • 2.5mm²</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleSwitch('prese')" id="btn-switch-prese" class="px-3 py-1.5 bg-emerald-500 text-tech-dark font-extrabold text-xs rounded-xl shadow transition-all">
+                            ON
+                        </button>
+                    </div>
+
+                    <!-- MCB LIGHTING LUCI (C10) -->
+                    <div class="bg-tech-panel p-3 rounded-2xl border border-tech-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-300 flex items-center justify-center font-mono font-bold text-xs">
+                                C10
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Linea Luci & Comandi</h4>
+                                <span class="text-[10px] text-slate-400 font-mono block">Magnetotermico 10A • 1.5mm²</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleSwitch('luci')" id="btn-switch-luci" class="px-3 py-1.5 bg-emerald-500 text-tech-dark font-extrabold text-xs rounded-xl shadow transition-all">
+                            ON
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="bg-tech-card border border-tech-border rounded-3xl p-5 flex flex-col gap-3 shadow-xl">
+                <h3 class="font-bold text-sm text-white flex items-center gap-2 border-b border-tech-border pb-3">
+                    <i class="fa-solid fa-book-bookmark text-amber-400"></i> Schede di Approfondimento
+                </h3>
+
+                <div class="grid grid-cols-1 gap-2">
+                    <button onclick="openNodeDetail('pozzetto')" class="w-full p-3 bg-tech-panel hover:bg-slate-800 rounded-2xl border border-amber-500/40 transition-all flex items-center justify-between text-left">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-arrow-down-long text-amber-400 text-base"></i>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Pozzetto & Picchetto di Terra</h4>
+                                <span class="text-[10px] text-amber-300 font-mono">Dispersore in Rame & Resistenza R_T</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                    </button>
+
+                    <button onclick="openNodeDetail('eqp')" class="w-full p-3 bg-tech-panel hover:bg-slate-800 rounded-2xl border border-tech-border transition-all flex items-center justify-between text-left">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-faucet-drip text-cyan-400 text-base"></i>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Equipotenzialità EQP / EQS</h4>
+                                <span class="text-[10px] text-slate-400">Collegamento Tubi Acqua, Gas e Masse</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                    </button>
+
+                    <button onclick="openNodeDetail('salvavita')" class="w-full p-3 bg-tech-panel hover:bg-slate-800 rounded-2xl border border-tech-border transition-all flex items-center justify-between text-left">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-shield-halved text-purple-400 text-base"></i>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Differenziale & Legge di Kirchhoff</h4>
+                                <span class="text-[10px] text-slate-400">Somma Vettoriale Correnti e Soglia 30mA</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                    </button>
+
+                    <button onclick="openNodeDetail('magnetotermico')" class="w-full p-3 bg-tech-panel hover:bg-slate-800 rounded-2xl border border-tech-border transition-all flex items-center justify-between text-left">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-fire text-rose-400 text-base"></i>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Magnetotermico (Sgancio C10/C16)</h4>
+                                <span class="text-[10px] text-slate-400">Protezione Sovraccarichi & Cortocircuiti</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- TECHNICAL NODE DETAIL MODAL -->
+    <div id="modal-detail" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-tech-card border border-tech-border rounded-3xl max-w-xl w-full p-6 shadow-2xl relative flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('modal-detail')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 pb-3 border-b border-tech-border">
+                <div id="modal-icon-bg" class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                    <i id="modal-icon" class="fa-solid fa-earth-europe"></i>
+                </div>
+                <div>
+                    <h3 id="modal-title" class="font-bold text-lg text-white">Titolo Dettaglio</h3>
+                    <span id="modal-subtitle" class="text-xs text-amber-400 font-mono">Normativa CEI 64-8 • Scheda Tecnica</span>
+                </div>
+            </div>
+
+            <div id="modal-body" class="text-xs text-slate-300 space-y-3 leading-relaxed">
+                <!-- Dynamic Content Injection -->
+            </div>
+
+            <div class="pt-3 border-t border-tech-border flex justify-end">
+                <button onclick="closeModal('modal-detail')" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-tech-dark font-extrabold text-xs rounded-xl transition-all shadow-lg">
+                    Chiudi Scheda
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAULT SIMULATOR EXPERIMENT MODAL -->
+    <div id="modal-fault" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-tech-card border border-tech-border rounded-3xl max-w-xl w-full p-6 shadow-2xl relative flex flex-col gap-4">
+            <button onclick="closeModal('modal-fault')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 pb-3 border-b border-tech-border">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-flask"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-white">Laboratorio Sperimentale Guasti e Dispersione</h3>
+                    <span class="text-xs text-amber-400 font-mono">Simulazione Scarico a Terra e Protezioni</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 py-1">
+                <!-- Fault Option 1: Ground Leakage Dispersione -->
+                <div onclick="runFaultExperiment('dispersione')" class="cursor-pointer bg-tech-panel hover:bg-amber-950/40 border border-amber-500/50 p-3.5 rounded-2xl transition-all flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">1. Dispersione a Terra in Bagno / Lavatrice</h4>
+                            <span class="text-[10px] text-slate-400">Guasto isolamento -> Scarico su PE e Picchetto -> Scatto RCD.</span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold rounded-lg">Simula Scarico</span>
+                </div>
+
+                <!-- Fault Option 2: Overload -->
+                <div onclick="runFaultExperiment('sovraccarico')" class="cursor-pointer bg-tech-panel hover:bg-slate-800 border border-tech-border p-3.5 rounded-2xl transition-all flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-temperature-arrow-up"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">2. Sovraccarico Termico in Cucina (&gt;16A)</h4>
+                            <span class="text-[10px] text-slate-400">Troppi elettrodomestici accesi -> Sgancio Bimetallico C16.</span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 bg-slate-800 text-slate-300 font-mono text-[10px] font-bold rounded-lg">Avvia</span>
+                </div>
+
+                <!-- Fault Option 3: Short Circuit -->
+                <div onclick="runFaultExperiment('cortocircuito')" class="cursor-pointer bg-tech-panel hover:bg-slate-800 border border-tech-border p-3.5 rounded-2xl transition-all flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">3. Cortocircuito Diretto (Fase + Neutro)</h4>
+                            <span class="text-[10px] text-slate-400">Contatto diretto a resistenza quasi nulla -> Scatto Bobina.</span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 bg-slate-800 text-slate-300 font-mono text-[10px] font-bold rounded-lg">Avvia</span>
+                </div>
+
+                <!-- Fault Option 4: Lightning Surge -->
+                <div onclick="runFaultExperiment('sovratensione')" class="cursor-pointer bg-tech-panel hover:bg-slate-800 border border-tech-border p-3.5 rounded-2xl transition-all flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-cloud-bolt"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">4. Sovratensione Atmosferica da Fulmine</h4>
+                            <span class="text-[10px] text-slate-400">Picco d'impulso di rete -> Conduzione Varistore SPD verso Terra.</span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 bg-slate-800 text-slate-300 font-mono text-[10px] font-bold rounded-lg">Avvia</span>
+                </div>
+            </div>
+
+            <!-- Experiment Output Console -->
+            <div id="experiment-output" class="hidden bg-slate-900 border border-amber-500/40 p-4 rounded-2xl flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <span id="exp-title" class="text-xs font-bold text-amber-400">Risultato Simulazione</span>
+                    <span id="exp-badge" class="text-[9px] font-mono bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">Scarico Attivo</span>
+                </div>
+                <p id="exp-desc" class="text-xs text-slate-300 leading-relaxed"></p>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeModal('modal-fault')" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all">
+                    Chiudi Laboratorio
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NORMATIVE REQUIREMENTS TABLE MODAL (CEI 64-8 LVL 1) -->
+    <div id="modal-norms" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-tech-card border border-tech-border rounded-3xl max-w-3xl w-full p-6 shadow-2xl relative flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('modal-norms')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 pb-3 border-b border-tech-border">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-table"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-white">Requisiti Messa a Terra & Dotazioni CEI 64-8</h3>
+                    <span class="text-xs text-amber-400 font-mono">Norme Obbligatorie per la Sicurezza dell'Impianto Civile</span>
+                </div>
+            </div>
+
+            <!-- Normative Table Content -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-tech-panel text-slate-200 font-bold uppercase font-mono text-[10px]">
+                        <tr>
+                            <th class="p-3 border-b border-tech-border">Componente Impianto</th>
+                            <th class="p-3 border-b border-tech-border">Requisito CEI 64-8</th>
+                            <th class="p-3 border-b border-tech-border">Note di Sicurezza e Collaudo</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-tech-border">
+                        <tr>
+                            <td class="p-3 font-bold text-amber-300">Dispersore di Terra (Picchetto)</td>
+                            <td class="p-3 font-mono">Acciaio zincato (&ge;2m) o Rame (&ge;1.5m)</td>
+                            <td class="p-3">Infisso nel pozzetto in terreno naturale non asfaltato.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-amber-300">Conduttore PE Principale</td>
+                            <td class="p-3 font-mono">Sezione min 6 mm² (fino a 16mm² montante)</td>
+                            <td class="p-3">Colore regolamentare unico Giallo-Verde.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-amber-300">Collettore EQPT</td>
+                            <td class="p-3">Barra di terra in rame nel quadro elettrico</td>
+                            <td class="p-3">Punto centrale di giunzione per tutti i conduttori PE.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-amber-300">Collegamenti EQP / EQS</td>
+                            <td class="p-3 font-mono">Sezione min 2.5 mm² protetti / 4 mm² liberi</td>
+                            <td class="p-3">Messa a terra di tubazioni metalliche acqua, gas, riscaldamento.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-white">Protezione Differenziale (RCD)</td>
+                            <td class="p-3 font-mono">Sensibilità I&Delta;n &le; 30mA (Tipo A / F)</td>
+                            <td class="p-3 text-emerald-400">Obbligatorio su tutte le linee prese ed ambienti umidi.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-white">Sezione Conduttori Prese / Luci</td>
+                            <td class="p-3 font-mono">Prese: 2.5 mm² • Luci: 1.5 mm²</td>
+                            <td class="p-3">Dimensionati per prevenire surriscaldamento ed effetto Joule.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pt-2 flex justify-end border-t border-tech-border">
+                <button onclick="closeModal('modal-norms')" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-tech-dark font-extrabold text-xs rounded-xl transition-all">
+                    Ho Capito
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STUDENT GUIDED TOUR OVERLAY MODAL -->
+    <div id="modal-tour" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-tech-card border border-tech-border rounded-3xl max-w-lg w-full p-6 shadow-2xl relative flex flex-col gap-4">
+            <div class="flex items-center justify-between pb-3 border-b border-tech-border">
+                <div class="flex items-center gap-2">
+                    <span id="tour-badge" class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs font-mono">1/6</span>
+                    <h3 id="tour-step-title" class="font-bold text-base text-white">Titolo Tour</h3>
+                </div>
+                <button onclick="endTour()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i> Chiudi Tour</button>
+            </div>
+
+            <div id="tour-step-body" class="text-xs text-slate-300 leading-relaxed min-h-[110px]">
+                <!-- Step Explanation Body -->
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-tech-border">
+                <button onclick="prevTourStep()" id="tour-btn-prev" class="px-4 py-2 bg-slate-800 text-slate-400 hover:text-white text-xs rounded-xl transition-all disabled:opacity-40" disabled>
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Indietro
+                </button>
+                <button onclick="nextTourStep()" id="tour-btn-next" class="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-tech-dark font-extrabold text-xs rounded-xl transition-all shadow-lg">
+                    Avanti <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System State
+        const systemState = {
+            main: true,
+            rcd: true,
+            prese: true,
+            luci: true
+        };
+
+        // Complete Technical Knowledge Database (Grounding & CEI 64-8 Focus)
+        const technicalData = {
+            pozzetto: {
+                title: "Pozzetto d'Ispezione & Dispersore di Terra",
+                subtitle: "Elettrodo a Picchetto in Rame / Acciaio Ramato & Pozzetto Praticabile",
+                icon: "fa-arrow-down-long",
+                color: "amber",
+                body: `
+                    <p><strong>Funzione del Dispersore:</strong> Il picchetto di terra è un picchetto in rame o acciaio zincato di lunghezza compresa tra 1.5m e 2.5m infisso verticalmente nel terreno naturale sotto l'edificio.</p>
+                    <p class="mt-2"><strong>Il Pozzetto Ispezionabile:</strong> Deve essere protetto da un chiusino in cemento o plastica ed essere accessibile per:</p>
+                    <ul class="list-disc pl-4 space-y-1 text-slate-300">
+                        <li>Misurare periodicamente la <strong>Resistenza di Terra ($R_T$)</strong> con il metodo volt-amperometrico (Tellurometro).</li>
+                        <li>Verificare l'assenza di corrosione sui morsetti di serraggio del cavo PE.</li>
+                    </ul>
+                    <p class="mt-2"><strong>Principio di Scarico:</strong> Quando si verifica un guasto verso la carcassa di un elettrodomestico, la corrente elettrica defluisce attraverso il cavo giallo-verde nel picchetto, disperdendosi uniformemente nella massa della Terra.</p>
+                `
+            },
+            eqp: {
+                title: "Collegamenti Equipotenziali (EQP ed EQS)",
+                subtitle: "Eliminazione delle Differenze di Potenziale sulle Masse Estranee",
+                icon: "fa-faucet-drip",
+                color: "cyan",
+                body: `
+                    <p><strong>Cosa sono le Masse Estranee:</strong> Tubazioni metalliche dell'acqua, del gas, dei termosifoni e strutture metalliche dell'edificio che possono introdurre un potenziale di terra esterno.</p>
+                    <p class="mt-2"><strong>Principio di Equipotenzialità:</strong> Se una persona tocca contemporaneamente una lavatrice in guasto ed un rubinetto metallico non collegato a terra, subirebbe una violenta scossa dovuta alla differenza di potenziale tra i due elementi.</p>
+                    <p class="mt-2">Collegando con un cavo Giallo-Verde le tubazioni al Collettore Principale (EQPT), si garantisce che tutti gli elementi metallici siano sempre allo <strong>stesso potenziale elettrico</strong> ($V_1 = V_2 \implies \Delta V = 0$).</p>
+                `
+            },
+            quadro: {
+                title: "Quadro Generale & Collettore di Terra EQPT",
+                subtitle: "Nodo Centrale di Distribuzione e Barra Equipotenziale",
+                icon: "fa-box-archive",
+                color: "emerald",
+                body: `
+                    <p>Il Quadro Elettrico ospita al suo interno la <strong>Barra EQPT (Equipotential Busbar)</strong> in rame purissimo.</p>
+                    <p class="mt-2">Tutti i cavi PE Giallo-Verde provenienti dalle singole stanze (soggiorno, cucina, bagno, camere) e dai collegamenti EQP dei tubi convertono in questa barra. Da qui parte il montante principale di terra (sezione 6-10 mm²) diretto al pozzetto esterno.</p>
+                `
+            },
+            salvavita: {
+                title: "Interruttore Differenziale (RCD) & Protezione Persone",
+                subtitle: "Coordinamento con la Terra e Soglia di Sicurezza 30mA",
+                icon: "fa-shield-halved",
+                color: "purple",
+                body: `
+                    <p>Il Salvavita controlla continuamente che la corrente entrante dalla Fase sia identica a quella uscente dal Neutro ($\sum I = 0$).</p>
+                    <p class="mt-2"><strong>Se si verifica una dispersione:</strong> La corrente dispersa fluisce nel cavo PE di terra verso il picchetto. Lo sbilanciamento supera la soglia di $30\,\text{mA}$ ($0.03\,\text{A}$) ed il differenziale scatta in meno di $30\,\text{millisecondi}$, isolando l'impianto prima che la tensione di contatto superi i $50\,\text{Volt}$.</p>
+                `
+            },
+            magnetotermico: {
+                title: "Interruttore Magnetotermico (MCB)",
+                subtitle: "Protezione Conduttori da Sovraccarico e Cortocircuito",
+                icon: "fa-fire",
+                color: "rose",
+                body: `
+                    <p>Protegge la struttura ed i cavi dell'impianto:</p>
+                    <ul class="list-disc pl-4 space-y-1 text-slate-300">
+                        <li><strong>Sgancio Termico (Bimetallo):</strong> Interviene lentamente quando si collegano troppi carichi superando la portata del cavo (es. $>16\text{A}$ su $2.5\,\text{mm}^2$).</li>
+                        <li><strong>Sgancio Magnetico (Bobina):</strong> Interviene istantaneamente in caso di cortocircuito diretto Fase-Neutro (correnti di centinaia di Ampere).</li>
+                    </ul>
+                `
+            },
+            soggiorno: {
+                title: "Zona Soggiorno: Prese e Terra",
+                subtitle: "Standard CEI 64-8 Livello 1",
+                icon: "fa-tv",
+                color: "purple",
+                body: "<p>I punti presa dispongono del terzo alveolo centrale di terra collegato al cavo PE $2.5\,\text{mm}^2$. Garantisce la messa a terra di TV, console e lampade da terra.</p>"
+            },
+            cucina: {
+                title: "Zona Cucina & Carichi Pesanti",
+                subtitle: "Elettrodomestici a Rischio Dispersione",
+                icon: "fa-utensils",
+                color: "sky",
+                body: "<p>Cucina e forno elettrico hanno gusci metallici soggetti a possibili guasti di isolamento per calore o umidità. La messa a terra tramite presa Schuko/P40 è cruciale per la sicurezza.</p>"
+            },
+            bagno: {
+                title: "Zona Bagno & Volumi di Protezione",
+                subtitle: "CEI 64-8/7 Ambienti a Maggior Rischio",
+                icon: "fa-shower",
+                color: "rose",
+                body: "<p>La bagnatura della pelle riduce la resistenza elettrica del corpo umano. Tutte le prese in Zona 3 devono avere contatto di terra PE efficientissimo e protezione RCD $30\,\text{mA}$.</p>"
+            },
+            camera: {
+                title: "Zona Camera da Letto",
+                subtitle: "Prese e Comandi Luce",
+                icon: "fa-bed",
+                color: "amber",
+                body: "<p>Prese bivalenti bipasso $10/16\,\text{A}$ con schermatura alveoli e conduttore PE per sicurezza attiva e passiva.</p>"
+            },
+            ingresso: {
+                title: "Scatola di Derivazione",
+                subtitle: "Morsettiere di Distribuzione PE e Linee",
+                icon: "fa-box-open",
+                color: "slate",
+                body: "<p>Contiene i morsetti componibili a mantello per la distribuzioni delle dorsali $2.5\,\text{mm}^2$ e $1.5\,\text{mm}^2$ e del nodo PE terra di zona.</p>"
+            }
+        };
+
+        // Switch Toggle Handler
+        function toggleSwitch(key) {
+            systemState[key] = !systemState[key];
+            
+            if (key === 'main' && !systemState.main) {
+                systemState.rcd = false;
+                systemState.prese = false;
+                systemState.luci = false;
+            } else if (key === 'main' && systemState.main) {
+                systemState.rcd = true;
+                systemState.prese = true;
+                systemState.luci = true;
+            }
+
+            if (key === 'rcd' && !systemState.rcd) {
+                systemState.prese = false;
+                systemState.luci = false;
+            }
+
+            updateSystemUI();
+        }
+
+        // Test RCD Button Action
+        function testRCD() {
+            systemState.rcd = false;
+            systemState.prese = false;
+            systemState.luci = false;
+            updateSystemUI();
+            alert("TEST DIFFERENZIALE RIUSCITO:\nIl pulsante di prova ha creato uno sbilanciamento calibrato di 30mA tra Fase e Neutro. Il Salvavita è scattato in 20ms isolando l'intero impianto!");
+        }
+
+        // Update UI Visuals & SVG Flow Wires
+        function updateSystemUI() {
+            const keys = ['main', 'rcd', 'prese', 'luci'];
+            keys.forEach(k => {
+                const btn = document.getElementById(`btn-switch-${k}`);
+                if (btn) {
+                    if (systemState[k]) {
+                        btn.innerText = 'ON';
+                        btn.className = 'px-3 py-1.5 bg-emerald-500 text-tech-dark font-extrabold text-xs rounded-xl shadow transition-all';
+                    } else {
+                        btn.innerText = 'OFF';
+                        btn.className = 'px-3 py-1.5 bg-rose-600 text-white font-extrabold text-xs rounded-xl shadow transition-all';
+                    }
+                }
+            });
+
+            const isPowerOn = systemState.main && systemState.rcd && systemState.prese;
+            const isLightOn = systemState.main && systemState.rcd && systemState.luci;
+
+            const elemPrese = document.getElementById('telemetry-prese');
+            if (elemPrese) {
+                elemPrese.innerText = isPowerOn ? '230V • 2.5mm² (OK)' : '0V • Tensione Assente';
+                elemPrese.className = isPowerOn ? 'text-xs font-bold font-mono text-emerald-400' : 'text-xs font-bold font-mono text-rose-400';
+            }
+
+            setWireState('wire-main', systemState.main);
+            setWireState('wire-power-kitchen', isPowerOn);
+            setWireState('wire-power-living', isPowerOn);
+            setWireState('wire-power-bed', isPowerOn);
+            setWireState('wire-power-bath', isPowerOn);
+
+            setWireState('wire-light-hall', isLightOn);
+            setWireState('wire-light-living', isLightOn);
+            setWireState('wire-light-bath', isLightOn);
+        }
+
+        function setWireState(wireId, isActive) {
+            const wire = document.getElementById(wireId);
+            if (!wire) return;
+            if (isActive) {
+                wire.classList.add('flow-active');
+                wire.setAttribute('stroke-opacity', '1');
+            } else {
+                wire.classList.remove('flow-active');
+                wire.setAttribute('stroke-opacity', '0.2');
+            }
+        }
+
+        // Modal Helpers
+        function openNodeDetail(key) {
+            const data = technicalData[key];
+            if (!data) return;
+
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-subtitle').innerText = data.subtitle;
+            document.getElementById('modal-body').innerHTML = data.body;
+
+            const iconContainer = document.getElementById('modal-icon-bg');
+            iconContainer.className = `w-12 h-12 rounded-2xl bg-${data.color}-500/20 text-${data.color}-400 flex items-center justify-center text-xl`;
+            document.getElementById('modal-icon').className = `fa-solid ${data.icon}`;
+
+            const modal = document.getElementById('modal-detail');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function openFaultSimulator() {
+            const modal = document.getElementById('modal-fault');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function openNormsModal() {
+            const modal = document.getElementById('modal-norms');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // Fault Experiments Simulation Engine
+        function runFaultExperiment(type) {
+            const output = document.getElementById('experiment-output');
+            const title = document.getElementById('exp-title');
+            const desc = document.getElementById('exp-desc');
+            const badge = document.getElementById('exp-badge');
+
+            output.classList.remove('hidden');
+
+            if (type === 'dispersione') {
+                systemState.rcd = false;
+                systemState.prese = false;
+                systemState.luci = false;
+                updateSystemUI();
+
+                title.innerText = "Simulazione Dispersione a Terra e Scarico Subterraneo";
+                badge.innerText = "Coordinamento RCD + Picchetto Ok";
+                badge.className = "text-[9px] font-mono bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold";
+                desc.innerHTML = "<strong>Dinamica del Guasto:</strong> Si verifica una perdita di isolamento nella lavatrice in Bagno. La corrente di guasto (45mA) fluisce istantaneamente sul conduttore di protezione PE (Giallo-Verde) verso il pozzetto di terra ed il picchetto infisso nel terreno.<br><br><strong>Reazione Protezioni:</strong> Il differenziale RCD rileva che la corrente di Neutro è inferiore a quella di Fase di 45mA (&gt;30mA). L'interruttore scatta in <strong>18 millisecondi</strong>. La tensione sulla carcassa viene scaricata a Terra e si azzera prima che l'utente possa subire una scossa!";
+            } else if (type === 'sovraccarico') {
+                systemState.prese = false;
+                updateSystemUI();
+
+                title.innerText = "Sovraccarico Termico sulla Linea Prese C16";
+                badge.innerText = "Sgancio Bimetallico Intervenuto";
+                badge.className = "text-[9px] font-mono bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded font-bold";
+                desc.innerHTML = "<strong>Dinamica del Guasto:</strong> Vengono accesi contemporaneamente Forno (2200W), Lavastoviglie (2000W) e Stufa Elettrica (1500W) per un assorbimento di oltre 25 Ampere.<br><br><strong>Reazione Protezioni:</strong> Il conduttore da 2.5mm² comincia a scaldarsi. La lamella bimetallica del magnetotermico C16 si piega per effetto Joule e sgancia la linea prese evitando la fusione dell'isolante dei cavi.";
+            } else if (type === 'cortocircuito') {
+                systemState.main = false;
+                systemState.rcd = false;
+                systemState.prese = false;
+                systemState.luci = false;
+                updateSystemUI();
+
+                title.innerText = "Cortocircuito Diretto Fase - Neutro";
+                badge.innerText = "Sgancio Magnetico Istantaneo";
+                badge.className = "text-[9px] font-mono bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold";
+                desc.innerHTML = "<strong>Dinamica del Guasto:</strong> Contatto diretto a resistenza nulla tra i cavi di Fase e Neutro.<br><br><strong>Reazione Protezioni:</strong> La corrente sale istantaneamente a 2000 Ampere. La bobina solenoide ad impulso magnetico aziona lo sgancio di emergenza del magnetotermico in meno di 5 millisecondi evitando archi elettrici ed esplosioni.";
+            } else if (type === 'sovratensione') {
+                title.innerText = "Scarica Atmosferica / Fulmine su Rete Elettrica";
+                badge.innerText = "Varistore SPD in Conduzione a Terra";
+                badge.className = "text-[9px] font-mono bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded font-bold";
+                desc.innerHTML = "<strong>Dinamica del Guasto:</strong> Un fulmine genera un impulso transitorio di 3500 Volt sulla linea di alimentazione del montante.<br><br><strong>Reazione Protezioni:</strong> Lo scaricatore SPD Tipo 2 crolla la propria resistenza e scarica l'impulso diretto verso il cavo PE ed il picchetto di terra, salvando televisori e computer da distruzione immediata.";
+            }
+        }
+
+        // Guided Tour Step Data
+        const tourSteps = [
+            {
+                title: "1. Benvenuto alla Lezione sulla Messa a Terra Civile",
+                body: "Il sistema di Messa a Terra è l'organo principale di sicurezza passiva in un impianto elettrico civile conforme alla norma CEI 64-8."
+            },
+            {
+                title: "2. Il Pozzetto ed il Picchetto Dispersore",
+                body: "In fondo alla planimetria puoi osservare il pozzetto di ispezione esterno ed il picchetto in rame infisso nel terreno naturale. È qui che le correnti di guasto vengono disperse in sicurezza nella Terra."
+            },
+            {
+                title: "3. Il Conduttore PE (Giallo-Verde)",
+                body: "I cavi di protezione PE di colore unico regolamentare Giallo-Verde collegano ogni singola presa e carcassa metallica di casa al Collettore Principale EQPT nel quadro elettrico."
+            },
+            {
+                title: "4. Il Salvavita (Differenziale 30mA)",
+                body: "In caso di dispersione verso la carcassa di un elettrodomestico, la corrente defluisce verso la Terra. Il salvavita rileva lo sbilanciamento (>30mA) e toglie tensione in meno di 30ms!"
+            },
+            {
+                title: "5. Collegamento Equipotenziale EQP",
+                body: "Tutte le masse estranee metalliche (tubi dell'acqua, del gas, riscaldamento) sono collegate al sistema di terra per azzerare qualsiasi differenza di potenziale pericolosa."
+            },
+            {
+                title: "6. Prova il Simulatore di Dispersione!",
+                body: "Chiudi il tour e clicca su 'Simula Dispersione' per osservare la corrente defluire nel cavo giallo-verde e nel pozzetto di terra con scatto immediato del differenziale!"
+            }
+        ];
+
+        let currentTourStep = 0;
+
+        function startTour() {
+            currentTourStep = 0;
+            updateTourView();
+            const modal = document.getElementById('modal-tour');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function endTour() {
+            closeModal('modal-tour');
+        }
+
+        function nextTourStep() {
+            if (currentTourStep < tourSteps.length - 1) {
+                currentTourStep++;
+                updateTourView();
+            } else {
+                endTour();
+            }
+        }
+
+        function prevTourStep() {
+            if (currentTourStep > 0) {
+                currentTourStep--;
+                updateTourView();
+            }
+        }
+
+        function updateTourView() {
+            const step = tourSteps[currentTourStep];
+            document.getElementById('tour-badge').innerText = `${currentTourStep + 1}/${tourSteps.length}`;
+            document.getElementById('tour-step-title').innerText = step.title;
+            document.getElementById('tour-step-body').innerHTML = step.body;
+
+            document.getElementById('tour-btn-prev').disabled = (currentTourStep === 0);
+            document.getElementById('tour-btn-next').innerText = (currentTourStep === tourSteps.length - 1) ? 'Completa' : 'Avanti';
+        }
+
+        // Initialize Application State on Load
+        window.onload = function() {
+            updateSystemUI();
+        };
+    </script>
+</body>
+</html>

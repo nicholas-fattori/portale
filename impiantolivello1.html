@@ -99,9 +99,8 @@
                 <div>
                     <h1 class="font-extrabold text-lg lg:text-xl tracking-tight bg-gradient-to-r from-amber-400 via-emerald-300 to-sky-400 bg-clip-text text-transparent flex items-center gap-2">
                         Impianto Elettrico Residenziale
-                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 font-semibold">CEI 64-8 • Messa a Terra & Livello 1</span>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 font-semibold">CEI 64-8</span>
                     </h1>
-                    <p class="text-xs text-slate-400 font-medium">Laboratorio Didattico Interattivo • Pozzetto di Terra, Dispersore, PE & Protezioni</p>
                 </div>
             </div>
 
@@ -132,7 +131,7 @@
                         <i class="fa-solid fa-earth-europe"></i>
                     </div>
                     <div>
-                        <span class="text-[11px] text-slate-400 font-medium block">Resistenza di Terra (R_T)</span>
+                        <span class="text-[11px] text-slate-400 font-medium block">Resistenza di Terra</span>
                         <span id="telemetry-rt" class="text-xs font-bold font-mono text-emerald-400">12.4 &Omega; (Conforme &le;50&Omega;)</span>
                     </div>
                 </div>
@@ -142,8 +141,8 @@
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <div>
-                        <span class="text-[11px] text-slate-400 font-medium block">Tensione Limite U_L</span>
-                        <span id="telemetry-ul" class="text-xs font-bold font-mono text-purple-300">&le; 50V AC (CEI 64-8)</span>
+                        <span class="text-[11px] text-slate-400 font-medium block">Tensione Limite</span>
+                        <span id="telemetry-ul" class="text-xs font-bold font-mono text-purple-300">&le; 50V AC</span>
                     </div>
                 </div>
 
@@ -152,8 +151,8 @@
                         <i class="fa-solid fa-plug"></i>
                     </div>
                     <div>
-                        <span class="text-[11px] text-slate-400 font-medium block">Linea Prese (C16)</span>
-                        <span id="telemetry-prese" class="text-xs font-bold font-mono text-emerald-400">230V • 2.5mm² (OK)</span>
+                        <span class="text-[11px] text-slate-400 font-medium block">Linea Prese</span>
+                        <span id="telemetry-prese" class="text-xs font-bold font-mono text-emerald-400">230V • 2.5mm²</span>
                     </div>
                 </div>
 
@@ -175,7 +174,7 @@
                     <div>
                         <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
                             <i class="fa-solid fa-diagram-project text-amber-400"></i>
-                            Planimetria Impianto & Sistema Subterraneo Messa a Terra
+                            Planimetria & Sistema Messa a Terra
                         </h2>
                         <p class="text-xs text-slate-400">Schema di cablaggio integrato con nodo equipotenziale EQPT, pozzetto d'ispezione e dispersore nel terreno.</p>
                     </div>
@@ -390,14 +389,11 @@
                         </span>
                     </div>
                     <p class="text-xs text-slate-300 leading-relaxed">
-                        La protezione contro i contatti indiretti si basa sul coordinamento tra l'<strong>Interruttore Differenziale ($I_{\Delta n}$)</strong> e la <strong>Resistenza dell'Impianto di Terra ($R_T$)</strong>:
+                        La protezione contro i contatti indiretti si basa sul coordinamento tra l'<strong>Interruttore Differenziale </strong> e la <strong>Resistenza dell'Impianto di Terra </strong>:
                     </p>
                     <div class="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl text-center font-mono text-xs text-amber-300">
-                        R_T &times; I_&Delta;n &le; U_L &nbsp;&rarr;&nbsp; R_T &times; 0.03A &le; 50V &nbsp;&rarr;&nbsp; R_T &le; 1666 &Omega;
+                        R_T &times; I_&Delta;n &le; VL &nbsp;&rarr;&nbsp; RT &times; 0.03A &le; 50V &nbsp;&rarr;&nbsp; RT &le; 1666 &Omega;
                     </div>
-                    <p class="text-[11px] text-slate-400 leading-relaxed">
-                        Nonostante il valore limite teorico sia $1666\,\Omega$, la CEI 64-8 raccomanda per le abitazioni valori di $R_T < 20\,\Omega \text{ o } 50\,\Omega$ per garantire interventi ultra-rapidi ed evitare tensioni residue pericolose sugli elettrodomestici.
-                    </p>
                 </div>
 
                 <!-- Ground Discharge Path Card -->
@@ -845,7 +841,7 @@
                 body: `
                     <p><strong>Cosa sono le Masse Estranee:</strong> Tubazioni metalliche dell'acqua, del gas, dei termosifoni e strutture metalliche dell'edificio che possono introdurre un potenziale di terra esterno.</p>
                     <p class="mt-2"><strong>Principio di Equipotenzialità:</strong> Se una persona tocca contemporaneamente una lavatrice in guasto ed un rubinetto metallico non collegato a terra, subirebbe una violenta scossa dovuta alla differenza di potenziale tra i due elementi.</p>
-                    <p class="mt-2">Collegando con un cavo Giallo-Verde le tubazioni al Collettore Principale (EQPT), si garantisce che tutti gli elementi metallici siano sempre allo <strong>stesso potenziale elettrico</strong> ($V_1 = V_2 \implies \Delta V = 0$).</p>
+                    <p class="mt-2">Collegando con un cavo Giallo-Verde le tubazioni al Collettore Principale (EQPT), si garantisce che tutti gli elementi metallici siano sempre allo <strong>stesso potenziale elettrico</strong>.</p>
                 `
             },
             quadro: {
@@ -864,8 +860,8 @@
                 icon: "fa-shield-halved",
                 color: "purple",
                 body: `
-                    <p>Il Salvavita controlla continuamente che la corrente entrante dalla Fase sia identica a quella uscente dal Neutro ($\sum I = 0$).</p>
-                    <p class="mt-2"><strong>Se si verifica una dispersione:</strong> La corrente dispersa fluisce nel cavo PE di terra verso il picchetto. Lo sbilanciamento supera la soglia di $30\,\text{mA}$ ($0.03\,\text{A}$) ed il differenziale scatta in meno di $30\,\text{millisecondi}$, isolando l'impianto prima che la tensione di contatto superi i $50\,\text{Volt}$.</p>
+                    <p>Il Salvavita controlla continuamente che la corrente entrante dalla Fase sia identica a quella uscente dal Neutro.</p>
+                    <p class="mt-2"><strong>Se si verifica una dispersione:</strong> La corrente dispersa fluisce nel cavo PE di terra verso il picchetto. Lo sbilanciamento supera la soglia di 30mA ed il differenziale scatta in meno di 30ms, isolando l'impianto prima che la tensione di contatto superi i 50V.</p>
                 `
             },
             magnetotermico: {
@@ -876,7 +872,7 @@
                 body: `
                     <p>Protegge la struttura ed i cavi dell'impianto:</p>
                     <ul class="list-disc pl-4 space-y-1 text-slate-300">
-                        <li><strong>Sgancio Termico (Bimetallo):</strong> Interviene lentamente quando si collegano troppi carichi superando la portata del cavo (es. $>16\text{A}$ su $2.5\,\text{mm}^2$).</li>
+                        <li><strong>Sgancio Termico (Bimetallo):</strong> Interviene lentamente quando si collegano troppi carichi superando la portata del cavo.</li>
                         <li><strong>Sgancio Magnetico (Bobina):</strong> Interviene istantaneamente in caso di cortocircuito diretto Fase-Neutro (correnti di centinaia di Ampere).</li>
                     </ul>
                 `
@@ -886,7 +882,7 @@
                 subtitle: "Standard CEI 64-8 Livello 1",
                 icon: "fa-tv",
                 color: "purple",
-                body: "<p>I punti presa dispongono del terzo alveolo centrale di terra collegato al cavo PE $2.5\,\text{mm}^2$. Garantisce la messa a terra di TV, console e lampade da terra.</p>"
+                body: "<p>I punti presa dispongono del terzo alveolo centrale di terra collegato al cavo PE. Garantisce la messa a terra di TV, console e lampade da terra.</p>"
             },
             cucina: {
                 title: "Zona Cucina & Carichi Pesanti",
@@ -900,21 +896,21 @@
                 subtitle: "CEI 64-8/7 Ambienti a Maggior Rischio",
                 icon: "fa-shower",
                 color: "rose",
-                body: "<p>La bagnatura della pelle riduce la resistenza elettrica del corpo umano. Tutte le prese in Zona 3 devono avere contatto di terra PE efficientissimo e protezione RCD $30\,\text{mA}$.</p>"
+                body: "<p>La bagnatura della pelle riduce la resistenza elettrica del corpo umano. Tutte le prese in Zona 3 devono avere contatto di terra PE efficientissimo e protezione RCD.</p>"
             },
             camera: {
                 title: "Zona Camera da Letto",
                 subtitle: "Prese e Comandi Luce",
                 icon: "fa-bed",
                 color: "amber",
-                body: "<p>Prese bivalenti bipasso $10/16\,\text{A}$ con schermatura alveoli e conduttore PE per sicurezza attiva e passiva.</p>"
+                body: "<p>Prese bivalenti bipasso 10/16A con schermatura alveoli e conduttore PE per sicurezza attiva e passiva.</p>"
             },
             ingresso: {
                 title: "Scatola di Derivazione",
                 subtitle: "Morsettiere di Distribuzione PE e Linee",
                 icon: "fa-box-open",
                 color: "slate",
-                body: "<p>Contiene i morsetti componibili a mantello per la distribuzioni delle dorsali $2.5\,\text{mm}^2$ e $1.5\,\text{mm}^2$ e del nodo PE terra di zona.</p>"
+                body: "<p>Contiene i morsetti componibili a mantello per la distribuzioni delle dorsali e del nodo PE terra di zona.</p>"
             }
         };
 

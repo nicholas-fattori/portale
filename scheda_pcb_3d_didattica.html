@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esploratore PCB 3D Interattivo - Elettronica Didattica</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- FontAwesome per Icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        pcb: {
+                            green: '#0b5329',
+                            copper: '#b87333',
+                            gold: '#ffd700',
+                            dark: '#08140c'
+                        },
+                        cyber: {
+                            blue: '#00f0ff',
+                            green: '#00ff66',
+                            purple: '#7000ff',
+                            dark: '#0a0e17'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050811;
+            color: #e2e8f0;
+            user-select: none;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        /* Glassmorphism panel styles */
+        .glass-panel {
+            background: rgba(10, 15, 29, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        .glass-panel-active {
+            border-color: rgba(0, 240, 255, 0.6);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+        }
+        /* Glowing text effects */
+        .glow-text-blue {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+        }
+        .glow-text-green {
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.7);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 240, 255, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 240, 255, 0.6);
+        }
+        /* Animated 3D Hotspot Pin Label */
+        .hotspot-label {
+            position: absolute;
+            transform: translate(-50%, -100%);
+            pointer-events: auto;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+        }
+        .hotspot-label:hover {
+            transform: translate(-50%, -108%) scale(1.05);
+        }
+        /* Pulsing Dot animation */
+        @keyframes pulse-glow {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 240, 255, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+        .pulse-marker {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-slate-200">
+
+    <!-- 3D Canvas container -->
+    <div id="canvas-container" class="absolute inset-0 z-0"></div>
+
+    <!-- UI Overlay Layer -->
+    <div id="ui-overlay" class="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-4 md:p-6 overflow-hidden">
+        
+        <!-- HEADER TOP -->
+        <header class="flex justify-between items-start w-full">
+            <div class="glass-panel p-4 rounded-xl pointer-events-auto max-w-lg border-l-4 border-l-cyan-400">
+                <div class="flex items-center space-x-3 mb-1">
+                    <span class="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                        LABORATORIO ELETTROTECNICA
+                    </span>
+                    <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-microchip mr-1"></i> Board v2.4 IoT</span>
+                </div>
+                <h1 class="text-xl md:text-2xl font-extrabold text-white tracking-wide glow-text-blue">
+                    Scheda Controllo IoT & Microcontrollore
+                </h1>
+                <p class="text-xs md:text-sm text-slate-300 mt-1 leading-relaxed">
+                    Esploratore didattico 3D per l'analisi dei componenti hardware, isolamento dei layer PCB e diagnosi circuitale.
+                </p>
+            </div>
+
+            <!-- Quick Action Stats / Status -->
+            <div class="hidden lg:flex flex-col items-end gap-2 pointer-events-auto">
+                <div class="glass-panel px-4 py-2 rounded-lg flex items-center space-x-3 text-xs font-mono">
+                    <span class="flex h-2.5 w-2.5 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-slate-300">Stato: <span class="text-emerald-400 font-bold">ALIMENTATO (230V AC / 5V DC)</span></span>
+                </div>
+                <button id="btn-open-quiz" class="glass-panel px-4 py-2.5 rounded-lg text-xs font-bold text-amber-300 hover:bg-amber-500/20 hover:border-amber-400 border border-amber-500/30 transition duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-base"></i> Test di Verifica Conoscenze
+                </button>
+            </div>
+        </header>
+
+        <!-- CENTER WORKSPACE (Hotspot labels injected dynamically here) -->
+        <div id="hotspot-layer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+        <!-- MAIN FOOTER & SIDEBAR CONTROLS -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end w-full">
+            
+            <!-- LEFT PANEL: Component Navigator -->
+            <div class="md:col-span-4 lg:col-span-3 glass-panel rounded-xl p-3 md:p-4 pointer-events-auto max-h-[40vh] md:max-h-[55vh] flex flex-col">
+                <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-700/60">
+                    <h3 class="text-xs font-bold font-mono text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-list-check"></i> Componenti Board
+                    </h3>
+                    <span id="comp-count" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">14 blocchi</span>
+                </div>
+                <div id="component-list" class="space-y-1.5 overflow-y-auto pr-1 text-xs">
+                    <!-- Dynamic Component Buttons will be inserted here -->
+                </div>
+            </div>
+
+            <!-- CENTER PANEL: Dynamic Technical Detail Viewer -->
+            <div id="detail-panel" class="md:col-span-5 lg:col-span-6 glass-panel rounded-xl p-4 md:p-5 pointer-events-auto transition-all duration-300 opacity-95">
+                <div id="detail-empty-state" class="text-center py-4 text-slate-400">
+                    <i class="fa-solid fa-hand-pointer text-2xl mb-2 text-cyan-400/60 animate-bounce"></i>
+                    <p class="text-sm font-medium">Seleziona un componente 3D o dalla lista a sinistra per visualizzare le specifiche tecniche dettagliate.</p>
+                </div>
+
+                <div id="detail-content" class="hidden flex-col gap-3">
+                    <div class="flex justify-between items-start border-b border-slate-700/60 pb-2">
+                        <div>
+                            <span id="detail-tag" class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-800">U1</span>
+                            <h2 id="detail-title" class="text-lg font-extrabold text-white mt-1">Microcontrollore Principale</h2>
+                        </div>
+                        <button id="btn-close-detail" class="text-slate-400 hover:text-white p-1">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Details Tab Grid -->
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                        <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[10px] uppercase">Funzione Circuitale</span>
+                            <span id="detail-function" class="text-cyan-300 font-semibold block mt-0.5">Elaborazione & Controllo</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[10px] uppercase">Package & Montaggio</span>
+                            <span id="detail-package" class="text-emerald-400 font-semibold block mt-0.5">DIP-28 THT</span>
+                        </div>
+                    </div>
+
+                    <div class="text-xs leading-relaxed text-slate-300 bg-slate-950/40 p-3 rounded-lg border border-slate-800/80">
+                        <p id="detail-desc">Descrizione estesa...</p>
+                    </div>
+
+                    <!-- Technical specs pill box -->
+                    <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-2.5 text-xs text-amber-200/90 flex items-start gap-2.5">
+                        <i class="fa-solid fa-lightbulb text-amber-400 text-sm mt-0.5"></i>
+                        <div>
+                            <span class="font-bold text-amber-300 block text-[11px] font-mono">NOTE DI LAYOUT & DIDATTICA:</span>
+                            <p id="detail-tip" class="text-[11px] text-amber-100/80 mt-0.5">Consiglio pratico per la progettazione...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: View & Layer Controls -->
+            <div class="md:col-span-3 lg:col-span-3 glass-panel rounded-xl p-3 md:p-4 pointer-events-auto flex flex-col gap-3">
+                <h3 class="text-xs font-bold font-mono text-cyan-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-700/60 pb-2">
+                    <i class="fa-solid fa-sliders"></i> Ispezione PCB & Vista
+                </h3>
+                
+                <!-- Layer Toggles -->
+                <div class="space-y-1.5 text-xs">
+                    <label class="flex items-center justify-between p-2 rounded bg-slate-900/50 hover:bg-slate-800/60 cursor-pointer border border-slate-800">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-microchip text-emerald-400"></i> Componenti Top</span>
+                        <input type="checkbox" id="toggle-components" checked class="accent-cyan-400 rounded cursor-pointer">
+                    </label>
+                    <label class="flex items-center justify-between p-2 rounded bg-slate-900/50 hover:bg-slate-800/60 cursor-pointer border border-slate-800">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-route text-amber-400"></i> Tracce Rame Top</span>
+                        <input type="checkbox" id="toggle-traces" checked class="accent-cyan-400 rounded cursor-pointer">
+                    </label>
+                    <label class="flex items-center justify-between p-2 rounded bg-slate-900/50 hover:bg-slate-800/60 cursor-pointer border border-slate-800">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-font text-slate-300"></i> Etichette 3D</span>
+                        <input type="checkbox" id="toggle-labels" checked class="accent-cyan-400 rounded cursor-pointer">
+                    </label>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button id="btn-reset-cam" class="bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs py-2 px-3 rounded-lg border border-slate-600 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Vista
+                    </button>
+                    <button id="btn-auto-spin" class="bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs py-2 px-3 rounded-lg border border-slate-600 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-arrows-spin"></i> Auto-Ruota
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL QUIZ FOR STUDENTS -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-xl rounded-2xl p-6 border-cyan-500/40 relative shadow-2xl">
+            <button id="btn-close-quiz" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-xl border border-cyan-500/40">
+                    <i class="fa-solid fa-clipboard-question text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Test di Ripasso: Hardware & PCB</h2>
+                    <p class="text-xs text-slate-400">Verifica le tue conoscenze di elettronica analogica e digitale.</p>
+                </div>
+            </div>
+
+            <div id="quiz-container" class="space-y-4">
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                    <span id="quiz-step" class="text-xs font-mono text-cyan-400 font-bold block mb-1">Domanda 1 di 3</span>
+                    <p id="quiz-question" class="text-sm font-semibold text-slate-100">Qual è il ruolo del condensatore elettrolitico posizionato vicino al regolatore di tensione?</p>
+                </div>
+
+                <div id="quiz-options" class="space-y-2">
+                    <!-- Options injected via JS -->
+                </div>
+
+                <div id="quiz-feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <span id="quiz-score" class="text-xs font-mono text-slate-400">Punteggio: 0</span>
+                    <button id="btn-next-quiz" class="hidden bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs font-mono transition">
+                        Prossima Domanda <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APPLICATION LOGIC -->
+    <script>
+        // --- 1. DATA DEFINITIONS FOR COMPONENTS ---
+        const componentsData = [
+            {
+                id: 'mcu',
+                tag: 'U1',
+                name: 'Microcontrollore (ATmega328P)',
+                function: 'Unità di Elaborazione Centrale (CPU)',
+                package: 'DIP-28 / SMT Dual In-Line',
+                position: { x: 0, y: 0.35, z: 0 },
+                cameraPos: { x: 0, y: 3.5, z: 2.5 },
+                description: 'È il "cervello" della scheda. Esegue le istruzioni del firmware memorizzate nella memoria Flash. Controlla i pin di Input/Output digitali e analogici, gestisce i timer e le comunicazioni seriali (UART, SPI, I2C).',
+                tip: 'In fase di sbrogno PCB, collocare sempre il microcontrollore centralmente per minimizzare la lunghezza delle tracce verso i connettori I/O.',
+                specs: 'Vcc: 5V DC | Frequenza: 16 MHz | Flash: 32 KB | SRAM: 2 KB'
+            },
+            {
+                id: 'transformer',
+                tag: 'T1',
+                name: 'Trasformatore di Alimentazione (AC-AC)',
+                function: 'Isolamento Galvano & Riduzione Tensione',
+                package: 'Encapsulated PCB Mount (EI30)',
+                position: { x: -3.8, y: 0.65, z: -2.0 },
+                cameraPos: { x: -4.5, y: 3.2, z: -0.5 },
+                description: 'Riduce la tensione alternata di rete (es. 230V AC) a una tensione alternata di sicurezza di basso valore (es. 9V-12V AC) garantendo l\'isolamento galvanico tra rete elettrica e circuito elettronico.',
+                tip: 'Mantenere sempre una distanza di isolamento (creepage/clearance) elevata sui tracciati di rame tra il primario ad alta tensione e il secondario a bassa tensione.',
+                specs: 'Primario: 230V AC 50Hz | Secondario: 9V AC 1.5VA | Isolamento: 4kV'
+            },
+            {
+                id: 'regulator',
+                tag: 'U2',
+                name: 'Regolatore LDO 5V (AMS1117 / TO-220)',
+                function: 'Stabilizzazione Tensione Principale 5V',
+                package: 'SOT-223 / TO-220 Tab',
+                position: { x: -2.0, y: 0.35, z: 1.8 },
+                cameraPos: { x: -2.0, y: 2.5, z: 3.5 },
+                description: 'Riduce la tensione di ingresso non regolata provienente dal raddrizzatore o dal jack DC ad un valore continuo e stabile di 5V indispensabile per il funzionamento della logica digitale.',
+                tip: 'I regolatori lineari dissipano l\'eccesso di tensione in calore. È vitale prevedere una congrua area di rame (Thermal Pad) sul PCB attorno al TAB di massa per la dissipazione termica.',
+                specs: 'Vin: 7-15V | Vout: 5.0V ±1% | Corrente max: 800mA'
+            },
+            {
+                id: 'regulator_3v3',
+                tag: 'U3',
+                name: 'Regolatore Secondario 3.3V (LDO)',
+                function: 'Alimentazione Sensori Low-Power',
+                package: 'SOT-23 SMT',
+                position: { x: -0.8, y: 0.25, z: 1.8 },
+                cameraPos: { x: -0.8, y: 2.2, z: 3.2 },
+                description: 'Fornisce un secondo binario di alimentazione stabilizzato a 3.3V necessario per moduli radio (Wi-Fi/Bluetooth), SD card e sensori digitali ad alta velocità.',
+                tip: 'Alimentare i moduli radio con un LDO dedicato evita che i picchi di assorbimento in trasmissione causino reset del microcontrollore principale.',
+                specs: 'Vin: 5.0V | Vout: 3.3V DC | Corrente max: 300mA'
+            },
+            {
+                id: 'transistor',
+                tag: 'Q1',
+                name: 'Transistor BJT NPN (BC547 / 2N2222)',
+                function: 'Interruttore Elettronico (Switch/Driver)',
+                package: 'TO-92 Plastic Package',
+                position: { x: 2.5, y: 0.3, z: 0.2 },
+                cameraPos: { x: 2.5, y: 2.2, z: 1.8 },
+                description: 'Pilotato dalla corrente di base uscita dai pin del microcontrollore, commuta carichi ad alta corrente (relè, buzzer, strisce LED) che l\'IC non potrebbe pilotare direttamente.',
+                tip: 'Inserire sempre un diodo di ricircolo (Flyback diode) in antiparallelo quando il transistor pilota carichi induttivi come bobine di relè o motori DC.',
+                specs: 'Tipo: NPN | Vceo: 45V | Ic max: 100mA | hFE: 200-450'
+            },
+            {
+                id: 'led_array',
+                tag: 'LED1-4',
+                name: 'Diodi LED di Stato Interattivi',
+                function: 'Segnalazione Ottica (PWR, TX, RX, ERR)',
+                package: 'SMD 0805 / THT 3mm',
+                position: { x: -2.3, y: 0.25, z: -1.2 },
+                cameraPos: { x: -2.3, y: 2.0, z: 0.5 },
+                description: 'Componenti a semiconduttore che emettono luce quando attraversati da corrente diretta. Indicano lo stato dell\'alimentazione (PWR), la trasmissione dati (TX/RX) e gli errori di sistema.',
+                tip: 'I LED richiedono SEMPRE una resistenza di limitazione R in serie per evitare che la corrente superi la Imax distruggendo la giunzione p-n (Formula: R = (Vcc - Vled)/Iled).',
+                specs: 'Vf: 1.8V - 3.2V | If tipica: 10mA-20mA | Colori: Verde, Blu, Rosso, Giallo'
+            },
+            {
+                id: 'usb',
+                tag: 'J1',
+                name: 'Interfaccia USB Type-B',
+                function: 'Alimentazione & Programmazione Serial',
+                package: 'THD Metallico Schermato',
+                position: { x: -3.8, y: 0.5, z: 0.0 },
+                cameraPos: { x: -4.5, y: 3.0, z: 1.0 },
+                description: 'Consente la trasmissione dati seriale via protocollo USB con il PC per il caricamento dello sketch e fornisce l’alimentazione a 5V per la scheda.',
+                tip: 'Le linee dati USB D+ e D- formano una coppia differenziale: devono avere la stessa lunghezza ed essere tracciate parallele per evitare disadattamenti di impedenza.',
+                specs: 'Tensione nominale: 5V DC | Max Corrente: 500mA (fusibile PPTC)'
+            },
+            {
+                id: 'power_jack',
+                tag: 'J2',
+                name: 'Connettore Alimentazione DC (Barrel Jack)',
+                function: 'Ingresso Alimentazione Esterna Non Regolata',
+                package: 'Through-Hole 2.1mm Pin',
+                position: { x: -3.8, y: 0.6, z: 2.0 },
+                cameraPos: { x: -4.5, y: 3.0, z: 3.8 },
+                description: 'Consente l\'alimentazione mediante un alimentatore esterno da rete o batteria. Accetta tensioni in ingresso tra 7V e 12V DC.',
+                tip: 'Prevedere sempre un diodo di protezione contro l\'inversione di polarità in serie con il polo positivo della presa DC.',
+                specs: 'Tensione Vin consigliata: 7-12V DC | Diametro Pin: 2.1mm'
+            },
+            {
+                id: 'cap_elec',
+                tag: 'C1',
+                name: 'Condensatore Elettrolitico Filtro',
+                function: 'Disaccoppiamento & Livellamento Ripple',
+                package: 'Cilindrico Radiale THT',
+                position: { x: -2.2, y: 0.6, z: 0.5 },
+                cameraPos: { x: -2.5, y: 2.5, z: 2.0 },
+                description: 'Condensatore polarizzato ad alta capacità inserito sulla linea di ingresso DC per livellare l\'ondulazione della tensione (ripple) e fornire riserva energetica durante i picchi di assorbimento.',
+                tip: 'Attenzione alla polarità! Un montaggio invertito in un condensatore elettrolitico può causare l\'esplosione dello stesso per sovrapressione interna.',
+                specs: 'Capacità: 47µF - 100µF | Tensione max: 25V | Polarizzato'
+            },
+            {
+                id: 'crystal',
+                tag: 'Y1',
+                name: 'Oscillatore al Quarzo (16 MHz)',
+                function: 'Generatore di Clock di Sistema',
+                package: 'HC-49/S Metallico Low-Profile',
+                position: { x: 1.2, y: 0.3, z: -1.0 },
+                cameraPos: { x: 1.2, y: 2.2, z: 0.8 },
+                description: 'Fornisce il segnale di clock fondamentale per sincronizzare l\'esecuzione delle istruzioni del microcontrollore con altissima precisione di frequenza.',
+                tip: 'Posizionare l\'oscillatore il più vicino possibile ai pin XTAL1/XTAL2 del microcontrollore e circondarlo con un piano di massa (Ground Guard Ring) per mitigare disturbi EMI.',
+                specs: 'Frequenza: 16.000 MHz | Stabilità: ±20 ppm | Capacità di carico: 18pF'
+            },
+            {
+                id: 'resistors',
+                tag: 'R1-R6',
+                name: 'Network Resistori di Limitazione',
+                function: 'Limitazione Corrente / Pull-Up / Base BJT',
+                package: 'Assiale THT / SMD 0805',
+                position: { x: 1.5, y: 0.25, z: 1.2 },
+                cameraPos: { x: 1.5, y: 2.0, z: 2.8 },
+                description: 'Resistenze utilizzate per limitare la corrente nei LED, polarizzare la base del transistor Q1 e mantenere le linee di controllo a livello logico definito (Pull-up).',
+                tip: 'Riconosci il valore dal codice a colori! Esempio: Marrone-Nero-Rosso-Oro = 1kΩ ±5%. In SMD usano codici a 3 cifre (es. 102 = 1000Ω).',
+                specs: 'Valori standard: 220Ω, 1kΩ, 10kΩ | Tolleranza: 5% | Potenza: 1/4W (250mW)'
+            },
+            {
+                id: 'headers_digital',
+                tag: 'J3',
+                name: 'Pin Header Sockets (Digital I/O)',
+                function: 'Connettività Moduli & Shield Esterni',
+                package: 'Female Header Strip 2.54mm pitch',
+                position: { x: 0.5, y: 0.4, z: -2.8 },
+                cameraPos: { x: 0.5, y: 2.8, z: -0.8 },
+                description: 'Morsettiera a pettine femmina con passo standard di 2.54mm (100 mil). Permette l\'innesto diretto di cavetti jumper e schede di espansione (Shield).',
+                tip: 'Il passo di 2.54mm è lo standard universale della prototipazione elettronica su breadboard.',
+                specs: 'Pitch: 2.54mm | Max Corrente/Pin: 3A | Pinout: D0-D13, GND, AREF'
+            },
+            {
+                id: 'headers_power',
+                tag: 'J4',
+                name: 'Pin Header (Power & Analog In)',
+                function: 'Distribuzione Alimentazioni e Input ADC',
+                package: 'Female Header Strip 2.54mm pitch',
+                position: { x: 0.5, y: 0.4, z: 2.8 },
+                cameraPos: { x: 0.5, y: 2.8, z: 0.8 },
+                description: 'Fornisce le tensioni di riferimento (5V, 3.3V, GND, Vin) e raccoglie i canali del convertitore Analogico-Digitale (ADC A0-A5) del microcontrollore.',
+                tip: 'Separare per quanto possibile i segnali analogici sensitivi dalle linee di alimentazione ad commutazione per prevenire il rumore sulle letture dei sensori.',
+                specs: 'Linee uscite: 5V, 3.3V, GND | Canali ADC: 6 ingressi (10-bit resolution)'
+            },
+            {
+                id: 'switch_reset',
+                tag: 'SW1',
+                name: 'Pulsante Tactile Reset',
+                function: 'Reset Hardware del Microcontrollore',
+                package: 'Tactile Switch 6x6mm SMT',
+                position: { x: -3.5, y: 0.35, z: -1.2 },
+                cameraPos: { x: -3.5, y: 2.0, z: 0.5 },
+                description: 'Pulsante momentaneo. Quando premuto porta a massa (0V) la linea di RESET del microcontrollore, riavviando l\'esecuzione del programma dall\'indirizzo 0x0000.',
+                tip: 'Richiede una resistenza di Pull-Up (es. 10kΩ) connessa a +5V per evitare che il pin di RESET rimanga in stato flottante (Floating Input) provocando riavvii casuali.',
+                specs: 'Configurazione: SPST-NO | Vita utile: 100,000 cicli | Debounce hardware/software'
+            }
+        ];
+
+        // --- 2. THREE.JS INITIALIZATION & SCENE SETUP ---
+        let scene, camera, renderer, controls;
+        let boardGroup, componentsGroup, tracesGroup, silkGroup, labelGroup;
+        let selectedComponentMesh = null;
+        const componentMeshes = {};
+        const hotspotElements = [];
+        
+        const container = document.getElementById('canvas-container');
+
+        function init3D() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050811);
+            scene.fog = new THREE.FogExp2(0x050811, 0.035);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 7, 7);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            container.appendChild(renderer.domElement);
+
+            // Orbit Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 - 0.02; // Don't go under PCB ground
+            controls.minDistance = 2;
+            controls.maxDistance = 15;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            mainLight.position.set(5, 10, 7);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            mainLight.shadow.bias = -0.0001;
+            scene.add(mainLight);
+
+            // Blue Cyber Rim Light
+            const rimLight = new THREE.DirectionalLight(0x00f0ff, 1.2);
+            rimLight.position.set(-6, 5, -5);
+            scene.add(rimLight);
+
+            // Warm accent light
+            const accentLight = new THREE.PointLight(0xffb700, 1, 10);
+            accentLight.position.set(0, 2, 0);
+            scene.add(accentLight);
+
+            // Create Groups
+            boardGroup = new THREE.Group();
+            componentsGroup = new THREE.Group();
+            tracesGroup = new THREE.Group();
+            silkGroup = new THREE.Group();
+            labelGroup = new THREE.Group();
+
+            boardGroup.add(componentsGroup);
+            boardGroup.add(tracesGroup);
+            boardGroup.add(silkGroup);
+            scene.add(boardGroup);
+
+            // Build Procedural 3D PCB Model
+            buildPCBSubstrate();
+            buildCopperTraces();
+            build3DComponents();
+            buildGridFloor();
+
+            // Populate UI Navigation & Hotspots
+            initUINavigation();
+            create3DHotspots();
+
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize);
+            renderer.domElement.addEventListener('click', onCanvasClick);
+
+            // Start Animation Loop
+            animate();
+        }
+
+        // --- 3. PROCEDURAL 3D MODEL GENERATION ---
+
+        // PCB Substrate (FR4 Material)
+        function buildPCBSubstrate() {
+            const pcbShape = new THREE.Shape();
+            const w = 9.0, h = 6.2, r = 0.3; // Board dimensions
+            pcbShape.moveTo(-w/2 + r, -h/2);
+            pcbShape.lineTo(w/2 - r, -h/2);
+            pcbShape.quadraticCurveTo(w/2, -h/2, w/2, -h/2 + r);
+            pcbShape.lineTo(w/2, h/2 - r);
+            pcbShape.quadraticCurveTo(w/2, h/2, w/2 - r, h/2);
+            pcbShape.lineTo(-w/2 + r, h/2);
+            pcbShape.quadraticCurveTo(-w/2, h/2, -w/2, h/2 - r);
+            pcbShape.lineTo(-w/2, -h/2 + r);
+            pcbShape.quadraticCurveTo(-w/2, -h/2, -w/2 + r, -h/2);
+
+            const extrudeSettings = { depth: 0.16, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.02, bevelThickness: 0.02 };
+            const geometry = new THREE.ExtrudeGeometry(pcbShape, extrudeSettings);
+            geometry.rotateX(Math.PI / 2);
+
+            // High Quality FR4 Green Solder Mask Material
+            const pcbMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0c5427,
+                roughness: 0.35,
+                metalness: 0.1,
+                clearcoat: 0.3,
+                clearcoatRoughness: 0.2
+            });
+
+            const pcbMesh = new THREE.Mesh(geometry, pcbMaterial);
+            pcbMesh.receiveShadow = true;
+            pcbMesh.castShadow = true;
+            boardGroup.add(pcbMesh);
+
+            // Mounting Holes (Corner Screws)
+            const holeGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.2, 16);
+            const goldMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 });
+            const holeCoords = [
+                [-w/2 + 0.4, -h/2 + 0.4],
+                [w/2 - 0.4, -h/2 + 0.4],
+                [-w/2 + 0.4, h/2 - 0.4],
+                [w/2 - 0.4, h/2 - 0.4]
+            ];
+
+            holeCoords.forEach(([hx, hz]) => {
+                const ring = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.35, 16), goldMat);
+                ring.rotation.x = -Math.PI / 2;
+                ring.position.set(hx, 0.09, hz);
+                boardGroup.add(ring);
+            });
+        }
+
+        // Realistic Copper Traces & Silkscreen Lines
+        function buildCopperTraces() {
+            const traceMat = new THREE.MeshStandardMaterial({
+                color: 0xc87d32,
+                metalness: 0.85,
+                roughness: 0.25
+            });
+            const pwrTraceMat = new THREE.MeshStandardMaterial({
+                color: 0xd9822b,
+                metalness: 0.9,
+                roughness: 0.2
+            });
+            const silkMat = new THREE.MeshBasicMaterial({ color: 0xf0f0f0 });
+
+            // Realistic circuit trace net paths
+            const pointsList = [
+                // AC Transformer output -> Rectifier Cap & 5V LDO
+                { pts: [ [-3.0, -1.8], [-2.2, -1.8], [-2.2, 0.5] ], width: 0.04, mat: pwrTraceMat },
+                // 5V LDO Reg -> 3.3V Reg & Electrolytic Cap
+                { pts: [ [-2.0, 1.5], [-2.0, 0.5], [-0.8, 0.5], [-0.8, 1.5] ], width: 0.035, mat: pwrTraceMat },
+                // 5V Line -> MCU VCC Pin
+                { pts: [ [-0.8, 1.8], [0.0, 1.8], [0.0, 0.4] ], width: 0.03, mat: pwrTraceMat },
+                // MCU Signal Pins -> Transistor Base via Resistor Network
+                { pts: [ [1.0, 0.2], [1.5, 0.2], [1.5, 1.0] ], width: 0.02, mat: traceMat },
+                { pts: [ [1.5, 1.2], [2.5, 1.2], [2.5, 0.3] ], width: 0.02, mat: traceMat },
+                // MCU Digital I/O -> Header Rails
+                { pts: [ [0.2, -0.4], [0.2, -2.5] ], width: 0.02, mat: traceMat },
+                { pts: [ [0.5, -0.4], [0.5, -2.5] ], width: 0.02, mat: traceMat },
+                { pts: [ [-0.5, -0.4], [-0.5, -2.5] ], width: 0.02, mat: traceMat },
+                { pts: [ [0.8, -0.4], [1.8, -1.2], [1.8, -2.5] ], width: 0.02, mat: traceMat },
+                // MCU Pins -> Crystal Oscillator (XTAL1 & XTAL2)
+                { pts: [ [1.0, -0.2], [1.2, -0.2], [1.2, -0.8] ], width: 0.02, mat: traceMat },
+                // USB D+/D- differential lines to MCU
+                { pts: [ [-3.2, 0.0], [-1.5, 0.0], [-1.5, -0.3], [-1.0, -0.3] ], width: 0.02, mat: traceMat },
+                // Reset Button -> MCU Reset Pin
+                { pts: [ [-3.2, -1.2], [-1.2, -1.2], [-1.2, -0.3] ], width: 0.02, mat: traceMat },
+                // LEDs Status Traces
+                { pts: [ [-2.3, -1.0], [-2.3, 0.2] ], width: 0.02, mat: traceMat }
+            ];
+
+            pointsList.forEach(item => {
+                const curvePoints = item.pts.map(p => new THREE.Vector3(p[0], 0.09, p[1]));
+                const geometry = new THREE.TubeGeometry(
+                    new THREE.CatmullRomCurve3(curvePoints),
+                    30, item.width, 8, false
+                );
+                const traceMesh = new THREE.Mesh(geometry, item.mat);
+                tracesGroup.add(traceMesh);
+            });
+
+            // Vias (holes connected between top & bottom layers)
+            const viaGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.2, 12);
+            const viaGold = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.1 });
+            const viaPositions = [
+                [0.8, -1.2], [-1.2, 1.2], [1.5, 0.5], [-2.5, -1.0], [2.2, -2.0],
+                [-0.8, 0.5], [2.5, 0.5], [-2.2, -1.8], [1.2, -0.8]
+            ];
+            viaPositions.forEach(([vx, vz]) => {
+                const via = new THREE.Mesh(viaGeo, viaGold);
+                via.position.set(vx, 0.08, vz);
+                tracesGroup.add(via);
+            });
+
+            // Silkscreen Border Frame
+            const borderGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-4.3, 0.09, -2.9),
+                new THREE.Vector3(4.3, 0.09, -2.9),
+                new THREE.Vector3(4.3, 0.09, 2.9),
+                new THREE.Vector3(-4.3, 0.09, 2.9),
+                new THREE.Vector3(-4.3, 0.09, -2.9)
+            ]);
+            const borderLine = new THREE.Line(borderGeo, silkMat);
+            silkGroup.add(borderLine);
+        }
+
+        // Build 3D Realistic Component Geometries
+        function build3DComponents() {
+            const blackChipMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.4, metalness: 0.2 });
+            const silverPinMat = new THREE.MeshStandardMaterial({ color: 0xdcdcdc, metalness: 0.9, roughness: 0.2 });
+            const metalBodyMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.85, roughness: 0.25 });
+            const plasticBlackMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.6 });
+
+            // 1. MCU ATmega328P DIP-28
+            const mcuGroup = new THREE.Group();
+            const bodyGeo = new THREE.BoxGeometry(2.4, 0.35, 0.8);
+            const mcuBody = new THREE.Mesh(bodyGeo, blackChipMat);
+            mcuBody.castShadow = true;
+            mcuGroup.add(mcuBody);
+
+            // DIP Notch
+            const notchGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.36, 16, 1, false, 0, Math.PI);
+            const notchMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+            const notch = new THREE.Mesh(notchGeo, notchMat);
+            notch.rotation.z = Math.PI / 2;
+            notch.position.set(-1.18, 0.02, 0);
+            mcuGroup.add(notch);
+
+            // DIP Pins (28 pins)
+            for (let i = 0; i < 14; i++) {
+                const px = -1.05 + i * 0.16;
+                [-0.45, 0.45].forEach(pz => {
+                    const pin = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.35, 0.1), silverPinMat);
+                    pin.position.set(px, -0.1, pz);
+                    mcuGroup.add(pin);
+                });
+            }
+            mcuGroup.position.set(0, 0.25, 0);
+            componentsGroup.add(mcuGroup);
+            componentMeshes['mcu'] = mcuGroup;
+
+            // 2. PCB Power Transformer (Encapsulated EI30 Blue Block)
+            const transGroup = new THREE.Group();
+            const transMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.3, metalness: 0.1 });
+            const transBody = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.1, 1.4), transMat);
+            transBody.castShadow = true;
+            transGroup.add(transBody);
+            // Label on Transformer
+            const labelGeo = new THREE.PlaneGeometry(1.2, 0.8);
+            const labelMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const transLabel = new THREE.Mesh(labelGeo, labelMat);
+            transLabel.rotation.x = -Math.PI / 2;
+            transLabel.position.y = 0.56;
+            transGroup.add(transLabel);
+            // Pins Primario e Secondario
+            [ [-0.5, -0.5], [-0.5, 0.5], [0.5, -0.5], [0.5, 0.5] ].forEach(([px, pz]) => {
+                const p = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.3, 8), silverPinMat);
+                p.position.set(px, -0.5, pz);
+                transGroup.add(p);
+            });
+            transGroup.position.set(-3.8, 0.65, -2.0);
+            componentsGroup.add(transGroup);
+            componentMeshes['transformer'] = transGroup;
+
+            // 3. Regolatore LDO 5V (AMS1117 / TO-220)
+            const regGroup = new THREE.Group();
+            const regBody = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 0.5), blackChipMat);
+            regGroup.add(regBody);
+            const regTab = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.05, 0.3), silverPinMat);
+            regTab.position.set(0, 0.15, -0.35);
+            regGroup.add(regTab);
+            regGroup.position.set(-2.0, 0.25, 1.8);
+            componentsGroup.add(regGroup);
+            componentMeshes['regulator'] = regGroup;
+
+            // 4. Regolatore LDO 3.3V Secondario (SOT-23)
+            const reg3v3Group = new THREE.Group();
+            const reg3v3Body = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.18, 0.25), blackChipMat);
+            reg3v3Group.add(reg3v3Body);
+            // SOT Pins
+            [-0.1, 0.1].forEach(px => {
+                const pin = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.08, 0.1), silverPinMat);
+                pin.position.set(px, -0.05, -0.15);
+                reg3v3Group.add(pin);
+            });
+            const pinOut = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.08, 0.1), silverPinMat);
+            pinOut.position.set(0, -0.05, 0.15);
+            reg3v3Group.add(pinOut);
+            reg3v3Group.position.set(-0.8, 0.15, 1.8);
+            componentsGroup.add(reg3v3Group);
+            componentMeshes['regulator_3v3'] = reg3v3Group;
+
+            // 5. Transistor BJT (TO-92 Package)
+            const transBjtGroup = new THREE.Group();
+            const to92Geo = new THREE.CylinderGeometry(0.2, 0.2, 0.45, 16, 1, false, 0, Math.PI * 1.3);
+            const bjtBody = new THREE.Mesh(to92Geo, blackChipMat);
+            bjtBody.rotation.y = Math.PI / 4;
+            bjtBody.castShadow = true;
+            transBjtGroup.add(bjtBody);
+            // 3 Pins (Emitter, Base, Collector)
+            [-0.1, 0, 0.1].forEach(px => {
+                const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.3, 8), silverPinMat);
+                pin.position.set(px, -0.3, 0);
+                transBjtGroup.add(pin);
+            });
+            transBjtGroup.position.set(2.5, 0.3, 0.2);
+            componentsGroup.add(transBjtGroup);
+            componentMeshes['transistor'] = transBjtGroup;
+
+            // 6. LED Array (PWR, TX, RX, ERR)
+            const ledsGroup = new THREE.Group();
+            const ledColors = [
+                { col: 0x00ff66, x: -2.7 }, // Green Power
+                { col: 0x00f0ff, x: -2.4 }, // Blue TX
+                { col: 0xffa500, x: -2.1 }, // Orange RX
+                { col: 0xff0055, x: -1.8 }  // Red Error
+            ];
+            ledColors.forEach(item => {
+                const ledMat = new THREE.MeshPhysicalMaterial({
+                    color: item.col,
+                    emissive: item.col,
+                    emissiveIntensity: 0.9,
+                    transparent: true,
+                    opacity: 0.9,
+                    roughness: 0.1
+                });
+                const ledDome = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.2, 16), ledMat);
+                ledDome.position.set(item.x, 0, 0);
+                ledDome.castShadow = true;
+                ledsGroup.add(ledDome);
+
+                // LED Ring Base
+                const ledBase = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.04, 16), silverPinMat);
+                ledBase.position.set(item.x, -0.09, 0);
+                ledsGroup.add(ledBase);
+            });
+            ledsGroup.position.set(0, 0.2, -1.2);
+            componentsGroup.add(ledsGroup);
+            componentMeshes['led_array'] = ledsGroup;
+
+            // 7. USB Type-B Connector
+            const usbGroup = new THREE.Group();
+            const usbBody = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.1, 1.2), metalBodyMat);
+            usbBody.castShadow = true;
+            usbGroup.add(usbBody);
+            const usbInner = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.9), plasticBlackMat);
+            usbInner.position.set(-0.3, 0, 0);
+            usbGroup.add(usbInner);
+            usbGroup.position.set(-3.8, 0.6, 0.0);
+            componentsGroup.add(usbGroup);
+            componentMeshes['usb'] = usbGroup;
+
+            // 8. DC Power Jack
+            const dcGroup = new THREE.Group();
+            const dcBody = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.1, 0.9), plasticBlackMat);
+            dcBody.castShadow = true;
+            dcGroup.add(dcBody);
+            const dcHole = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.8, 16), silverPinMat);
+            dcHole.rotation.z = Math.PI / 2;
+            dcHole.position.set(-0.4, 0.1, 0);
+            dcGroup.add(dcHole);
+            dcGroup.position.set(-3.8, 0.65, 2.0);
+            componentsGroup.add(dcGroup);
+            componentMeshes['power_jack'] = dcGroup;
+
+            // 9. Electrolytic Capacitor
+            const capGroup = new THREE.Group();
+            const capCylinder = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.8, 24), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.5, roughness: 0.3 }));
+            capCylinder.castShadow = true;
+            capGroup.add(capCylinder);
+            const capTop = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.05, 24), silverPinMat);
+            capTop.position.y = 0.4;
+            capGroup.add(capTop);
+            capGroup.position.set(-2.2, 0.5, 0.5);
+            componentsGroup.add(capGroup);
+            componentMeshes['cap_elec'] = capGroup;
+
+            // 10. Crystal Oscillator
+            const xtalGroup = new THREE.Group();
+            const xtalBody = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.35, 0.3), metalBodyMat);
+            xtalBody.castShadow = true;
+            xtalGroup.add(xtalBody);
+            xtalGroup.position.set(1.2, 0.25, -1.0);
+            componentsGroup.add(xtalGroup);
+            componentMeshes['crystal'] = xtalGroup;
+
+            // 11. Resistors Network
+            const resGroup = new THREE.Group();
+            const resBody = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 12), new THREE.MeshStandardMaterial({ color: 0xd2b48c }));
+            resBody.rotation.z = Math.PI / 2;
+            resGroup.add(resBody);
+            const bandColors = [0x8b4513, 0x000000, 0xff0000, 0xffd700];
+            bandColors.forEach((col, idx) => {
+                const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.105, 0.05, 12), new THREE.MeshBasicMaterial({ color: col }));
+                ring.rotation.z = Math.PI / 2;
+                ring.position.x = -0.15 + idx * 0.1;
+                resGroup.add(ring);
+            });
+            resGroup.position.set(1.5, 0.18, 1.2);
+            componentsGroup.add(resGroup);
+            componentMeshes['resistors'] = resGroup;
+
+            // 12. Header Sockets
+            const createHeaderRail = (length, x, z) => {
+                const railGroup = new THREE.Group();
+                const railBody = new THREE.Mesh(new THREE.BoxGeometry(length, 0.55, 0.3), plasticBlackMat);
+                railGroup.add(railBody);
+                for(let i=0; i<length*3; i++) {
+                    const hole = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.02, 0.1), new THREE.MeshBasicMaterial({ color: 0x000000 }));
+                    hole.position.set(-length/2 + 0.18 + (i*0.3), 0.28, 0);
+                    railGroup.add(hole);
+                }
+                railGroup.position.set(x, 0.35, z);
+                componentsGroup.add(railGroup);
+                return railGroup;
+            };
+            componentMeshes['headers_digital'] = createHeaderRail(3.6, 0.5, -2.8);
+            componentMeshes['headers_power'] = createHeaderRail(3.6, 0.5, 2.8);
+
+            // 13. Reset Tactile Button
+            const btnGroup = new THREE.Group();
+            const btnBase = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.2, 0.6), silverPinMat);
+            btnGroup.add(btnBase);
+            const btnActuator = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.15, 16), new THREE.MeshStandardMaterial({ color: 0xb91c1c }));
+            btnActuator.position.y = 0.15;
+            btnGroup.add(btnActuator);
+            btnGroup.position.set(-3.5, 0.2, -1.2);
+            componentsGroup.add(btnGroup);
+            componentMeshes['switch_reset'] = btnGroup;
+        }
+
+        // Futuristic Grid Floor
+        function buildGridFloor() {
+            const gridHelper = new THREE.GridHelper(30, 40, 0x00f0ff, 0x1e293b);
+            gridHelper.position.y = -1.5;
+            scene.add(gridHelper);
+        }
+
+        // --- 4. INTERACTIVE 3D HOTSPOTS & UI ---
+
+        function create3DHotspots() {
+            const hotspotLayer = document.getElementById('hotspot-layer');
+            hotspotLayer.innerHTML = '';
+
+            componentsData.forEach(comp => {
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'hotspot-label flex items-center gap-1.5 glass-panel px-2.5 py-1 rounded-full cursor-pointer hover:border-cyan-400 transition text-[11px] font-mono font-bold text-cyan-300';
+                labelDiv.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 pulse-marker"></span>
+                    <span>${comp.tag}</span>
+                `;
+                labelDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectComponent(comp.id);
+                });
+
+                hotspotLayer.appendChild(labelDiv);
+                hotspotElements.push({ element: labelDiv, pos: comp.position });
+            });
+        }
+
+        function updateHotspotPositions() {
+            if (!document.getElementById('toggle-labels').checked) {
+                hotspotElements.forEach(h => h.element.style.display = 'none');
+                return;
+            }
+
+            const tempV = new THREE.Vector3();
+            hotspotElements.forEach(h => {
+                tempV.set(h.pos.x, h.pos.y + 0.4, h.pos.z);
+                tempV.project(camera);
+
+                // Check if behind camera
+                if (tempV.z > 1) {
+                    h.element.style.display = 'none';
+                    return;
+                }
+
+                const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+                const y = (tempV.y * -0.5 + 0.5) * window.innerHeight;
+
+                h.element.style.display = 'flex';
+                h.element.style.left = `${x}px`;
+                h.element.style.top = `${y}px`;
+            });
+        }
+
+        function initUINavigation() {
+            const listContainer = document.getElementById('component-list');
+            listContainer.innerHTML = '';
+            document.getElementById('comp-count').innerText = `${componentsData.length} blocchi`;
+
+            componentsData.forEach(comp => {
+                const btn = document.createElement('button');
+                btn.id = `btn-comp-${comp.id}`;
+                btn.className = 'w-full text-left p-2 rounded-lg bg-slate-900/40 hover:bg-slate-800/80 border border-slate-800/80 flex items-center justify-between transition text-slate-300';
+                btn.innerHTML = `
+                    <div class="flex items-center gap-2 truncate">
+                        <span class="font-mono text-[10px] bg-cyan-950 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-800/50">${comp.tag}</span>
+                        <span class="font-medium text-xs truncate">${comp.name}</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+                `;
+                btn.addEventListener('click', () => selectComponent(comp.id));
+                listContainer.appendChild(btn);
+            });
+        }
+
+        // --- 5. INTERACTION & CAMERA ANIMATION LOGIC ---
+
+        let targetCameraPos = null;
+        let targetLookAt = null;
+
+        function selectComponent(id) {
+            const comp = componentsData.find(c => c.id === id);
+            if (!comp) return;
+
+            // Highlight Active UI List Item
+            componentsData.forEach(c => {
+                const el = document.getElementById(`btn-comp-${c.id}`);
+                if (el) {
+                    el.classList.remove('bg-cyan-950/80', 'border-cyan-500/50', 'text-cyan-300');
+                }
+            });
+            const activeBtn = document.getElementById(`btn-comp-${id}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-cyan-950/80', 'border-cyan-500/50', 'text-cyan-300');
+                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            // Update Detail Card
+            document.getElementById('detail-empty-state').classList.add('hidden');
+            const detailContent = document.getElementById('detail-content');
+            detailContent.classList.remove('hidden');
+            detailContent.classList.add('flex');
+
+            document.getElementById('detail-tag').innerText = comp.tag;
+            document.getElementById('detail-title').innerText = comp.name;
+            document.getElementById('detail-function').innerText = comp.function;
+            document.getElementById('detail-package').innerText = comp.package;
+            document.getElementById('detail-desc').innerText = comp.description;
+            document.getElementById('detail-tip').innerText = comp.tip;
+
+            // Trigger Camera Smooth Zoom/Focus
+            targetCameraPos = new THREE.Vector3(comp.cameraPos.x, comp.cameraPos.y, comp.cameraPos.z);
+            targetLookAt = new THREE.Vector3(comp.position.x, comp.position.y, comp.position.z);
+
+            // Highlight 3D mesh (Pulse scale)
+            if (componentMeshes[id]) {
+                if (selectedComponentMesh && selectedComponentMesh.scale) {
+                    selectedComponentMesh.scale.set(1, 1, 1);
+                }
+                selectedComponentMesh = componentMeshes[id];
+                selectedComponentMesh.scale.set(1.15, 1.15, 1.15);
+            }
+        }
+
+        function resetCameraView() {
+            targetCameraPos = new THREE.Vector3(0, 7, 7);
+            targetLookAt = new THREE.Vector3(0, 0, 0);
+            if (selectedComponentMesh) {
+                selectedComponentMesh.scale.set(1, 1, 1);
+                selectedComponentMesh = null;
+            }
+            document.getElementById('detail-content').classList.add('hidden');
+            document.getElementById('detail-content').classList.remove('flex');
+            document.getElementById('detail-empty-state').classList.remove('hidden');
+            
+            componentsData.forEach(c => {
+                const el = document.getElementById(`btn-comp-${c.id}`);
+                if (el) el.classList.remove('bg-cyan-950/80', 'border-cyan-500/50', 'text-cyan-300');
+            });
+        }
+
+        // Raycasting for clicking 3D models directly
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onCanvasClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(componentsGroup.children, true);
+
+            if (intersects.length > 0) {
+                let obj = intersects[0].object;
+                while (obj.parent && obj.parent !== componentsGroup) {
+                    obj = obj.parent;
+                }
+                // Find matching component ID
+                for (let key in componentMeshes) {
+                    if (componentMeshes[key] === obj) {
+                        selectComponent(key);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // --- 6. LAYER VISIBILITY & CONTROLS ---
+
+        document.getElementById('toggle-components').addEventListener('change', (e) => {
+            componentsGroup.visible = e.target.checked;
+        });
+        document.getElementById('toggle-traces').addEventListener('change', (e) => {
+            tracesGroup.visible = e.target.checked;
+        });
+        document.getElementById('btn-reset-cam').addEventListener('click', resetCameraView);
+        document.getElementById('btn-close-detail').addEventListener('click', resetCameraView);
+
+        let autoSpin = false;
+        document.getElementById('btn-auto-spin').addEventListener('click', () => {
+            autoSpin = !autoSpin;
+            controls.autoRotate = autoSpin;
+            controls.autoRotateSpeed = 2.0;
+            const btn = document.getElementById('btn-auto-spin');
+            if (autoSpin) {
+                btn.classList.add('bg-cyan-600', 'border-cyan-400');
+            } else {
+                btn.classList.remove('bg-cyan-600', 'border-cyan-400');
+            }
+        });
+
+        // --- 7. EDUCATIONAL QUIZ SYSTEM ---
+
+        const quizQuestions = [
+            {
+                q: "Qual è il compito principale del Transistor BJT (es. BC547) su una scheda a microcontrollore?",
+                options: [
+                    "Aumentare la frequenza dell'oscillatore al quarzo",
+                    "Fungere da interruttore elettronico per pilotare carichi ad alta corrente dai pin di I/O",
+                    "Regolare la tensione alternata in ingresso al trasformatore",
+                    "Filtrare i disturbi a frequenza elevata sulla linea di massa"
+                ],
+                correct: 1,
+                explanation: "Esatto! I pin del microcontrollore erogano solo pochi milliampere (max 20mA). Il BJT usa questa piccola corrente di base per commutare carichi maggiori."
+            },
+            {
+                q: "Perché è fondamentale collegare sempre una resistenza in serie ad un diodo LED?",
+                options: [
+                    "Per convertire la corrente continua in corrente alternata",
+                    "Per evitare che la corrente superi la Imax distruggendo la giunzione p-n del diodo",
+                    "Per immagazzinare energia durante l'effetto di carica",
+                    "Per invertire la polarità della tensione di alimentazione"
+                ],
+                correct: 1,
+                explanation: "Corretto! I LED non presentano una resistenza interna significativa una volta superata la tensione di soglia (Vf); senza resistenza serie si verifica una distruttiva sovracorrente."
+            },
+            {
+                q: "Qual è il ruolo del trasformatore (T1) all'ingresso della scheda?",
+                options: [
+                    "Convertire il segnale logico da seriale a parallelo",
+                    "Abbassare la tensione alternata di rete ed operare l'isolamento galvanico di sicurezza",
+                    "Generare il clock primario per l'esecuzione del codice",
+                    "Stabilizzare la tensione continua uscente dal regolatore LDO 5V"
+                ],
+                correct: 1,
+                explanation: "Ottimo! Il trasformatore riduce la tensione di rete AC a valori di sicurezza (es. 9V-12V AC) isolando fisicamente la rete elettrica dall'elettronica utente."
+            },
+            {
+                q: "Qual è la funzione del regolatore di tensione lineare (U2) su una scheda microcontrollore?",
+                options: [
+                    "Aumentare la frequenza del clock a 16MHz",
+                    "Convertire e stabilizzare la tensione in ingresso ad un valore costante di 5V",
+                    "Memorizzare le istruzioni del firmware eseguibile",
+                    "Fornire protezione dalle scariche elettrostatiche sugli I/O"
+                ],
+                correct: 1,
+                explanation: "Corretto! Il regolatore LDO (es. AMS1117) riduce tensioni di ingresso elevate a 5V continui puliti necessari per i microchip."
+            }
+        ];
+
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+
+        const quizModal = document.getElementById('quiz-modal');
+        document.getElementById('btn-open-quiz').addEventListener('click', () => {
+            currentQuizIdx = 0;
+            quizScore = 0;
+            loadQuizStep();
+            quizModal.classList.remove('hidden');
+        });
+        document.getElementById('btn-close-quiz').addEventListener('click', () => {
+            quizModal.classList.add('hidden');
+        });
+
+        function loadQuizStep() {
+            const q = quizQuestions[currentQuizIdx];
+            document.getElementById('quiz-step').innerText = `Domanda ${currentQuizIdx + 1} di ${quizQuestions.length}`;
+            document.getElementById('quiz-question').innerText = q.q;
+            document.getElementById('quiz-score').innerText = `Punteggio: ${quizScore}`;
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('btn-next-quiz').classList.add('hidden');
+
+            const optsContainer = document.getElementById('quiz-options');
+            optsContainer.innerHTML = '';
+
+            q.options.forEach((optText, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-medium text-slate-200 transition flex items-center justify-between';
+                btn.innerText = optText;
+                btn.addEventListener('click', () => checkAnswer(i, btn));
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btnElement) {
+            const q = quizQuestions[currentQuizIdx];
+            const feedback = document.getElementById('quiz-feedback');
+            const allBtns = document.getElementById('quiz-options').querySelectorAll('button');
+            
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selectedIdx === q.correct) {
+                quizScore += 10;
+                btnElement.classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-300');
+                feedback.className = 'p-3 rounded-xl text-xs font-semibold bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 block';
+                feedback.innerText = '✨ ' + q.explanation;
+            } else {
+                btnElement.classList.add('bg-rose-950', 'border-rose-500', 'text-rose-300');
+                allBtns[q.correct].classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-300');
+                feedback.className = 'p-3 rounded-xl text-xs font-semibold bg-rose-950/80 border border-rose-500/50 text-rose-300 block';
+                feedback.innerText = '❌ Risposta errata. ' + q.explanation;
+            }
+
+            document.getElementById('quiz-score').innerText = `Punteggio: ${quizScore}`;
+            
+            const nextBtn = document.getElementById('btn-next-quiz');
+            nextBtn.classList.remove('hidden');
+            if (currentQuizIdx === quizQuestions.length - 1) {
+                nextBtn.innerText = 'Completa Quiz';
+            } else {
+                nextBtn.innerText = 'Prossima Domanda';
+            }
+        }
+
+        document.getElementById('btn-next-quiz').addEventListener('click', () => {
+            currentQuizIdx++;
+            if (currentQuizIdx < quizQuestions.length) {
+                loadQuizStep();
+            } else {
+                alert(`Quiz Completato! Il tuo punteggio finale è: ${quizScore} / ${quizQuestions.length * 10}`);
+                quizModal.classList.add('hidden');
+            }
+        });
+
+        // --- 8. ANIMATION LOOP & RESIZE ---
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Smooth Interpolation for Camera Focus
+            if (targetCameraPos && targetLookAt) {
+                camera.position.lerp(targetCameraPos, 0.05);
+                controls.target.lerp(targetLookAt, 0.05);
+
+                if (camera.position.distanceTo(targetCameraPos) < 0.01) {
+                    targetCameraPos = null;
+                    targetLookAt = null;
+                }
+            }
+
+            controls.update();
+            updateHotspotPositions();
+            renderer.render(scene, camera);
+        }
+
+        // Initialize Application on Window Load
+        window.onload = () => {
+            init3D();
+        };
+    </script>
+</body>
+</html>

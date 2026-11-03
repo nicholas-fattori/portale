@@ -370,7 +370,8 @@ Nel caso del transistor PNP è necessario montarlo rovesciato, e dunque la corre
 <li>BJT riesce a gestire frequenze di commutazione al di sotto dei 100 kHz</li>
 
 <h2>Circuiti stampati</h2>
-<p>Un circuito stampato detto PCB (Printed Circuit Board) è un supporto isolante (solitamente fibra di vetro con resina epossidica, ossia che passa da stato liquido a solido diventando impermeabile, resistente e lucido) con piste di rame incise che collegano componenti elettronici.</p>
+						<p>Immagina di aprire lo smartphone, la lavatrice o la centralina di un'auto: all'interno troverai una piastra verde (o di altri colori) costellata di piste di rame luccicanti e componenti saldati. Quella piastra è il PCB (Printed Circuit Board). Il PCB non è solo un supporto meccanico per tenere insieme i componenti elettronici: è il vero e proprio sistema nervoso del dispositivo. Il suo compito è fissare meccanicamente i componenti nella posizione corretta e collegare elettricamente i componenti tra loro tramite piste conduttive in rame, eliminando la necessità di un intricato insieme di cavi volanti.</p>
+<p>Un circuito stampato è dunque un supporto isolante (solitamente fibra di vetro con resina epossidica, ossia che passa da stato liquido a solido diventando impermeabile, resistente e lucido) con piste di rame incise che collegano componenti elettronici.</p>
       <p>Una volta progettato in CAD, viene creato un substrato rivestendo una lastra di rame in entrambi i lati, applicando poi un photoresist, ossia un polimero che cambia le proprie proprietà strutturali a contatto con i raggi UV. Viene rimosso il rame non protetto (etching) e creati i fori che ospiteranno i componenti.</p>      
         <p>I fori vengono metalizzati e poi applicato uno strato protettivo di vari colori detto solder mask.</p>
            <p>I circuiti stampati differiscono per numero di strati (layers):</p>
@@ -381,8 +382,20 @@ Nel caso del transistor PNP è necessario montarlo rovesciato, e dunque la corre
             <li> rigidi </li>
             <li> flessibili </li>
             <li> semi-flessibili</li>
-            
-<p>Come porte logiche è importante ricordare: </p>
+			<p>Il Silicio è il re incontrastato dei semiconduttori. Dal silicio (estratto dalla sabbia e purificato) si ricavano i diodi, i transistor e i circuiti integrati. Senza il silicio, la logica di calcolo dei nostri circuiti non esisterebbe. Nella microelettronica moderna, la miniaturizzazione spinta richiede elementi chimici particolari (come il neodimio, il tantalio, l'oro e vari metalli preziosi o terre rare) utilizzati nei condensatori ceramici, nei display e nei microprocessori. Poiché questi materiali sono scarsi e difficili da estrarre, il riciclo dei RAEE (Rifiuti da Apparecchiature Elettriche ed Elettroniche) è diventato cruciale per recuperare materie prime preziose e ridurre l'impatto ambientale.</p>
+          <p>Quando progettiamo un circuito stampato, dobbiamo decidere come i componenti andranno a collegarsi alle piste di rame. Esistono due tecnologie principali:</p>
+						<li>THT (Foro Passante): i piedini dei componenti attraversano i fori praticati nel PCB e vengono saldati sul lato opposto;</li>
+						<li>SMD (Montaggio Superficiale): i componenti vengono appoggiati direttamente sulle piazzole di rame sulla superficie del PCB e saldati (spesso con pasta saldante e forni a rifusione).</li>
+<p>Hai presente quando cammini su un tappeto e prendi la scossa toccando una maniglia? Quella piccola scarica di migliaia di volt (anche se con bassissima corrente) può distruggere permanentemente la giunzione interna di un chip in silicio, spesso senza lasciare segni visibili. Infatti i laboratori e nelle linee di montaggio si usano banchi antistatici, braccialetti di messa a terra, pavimenti dissipativi e imballaggi schermati. Molti circuiti integrati moderni integrano internamente diodi di protezione ESD.</p>
+						<p>Ogni volta che una corrente variabile scorre in una pista, questa si comporta come una piccola antenna, emettendo onde elettromagnetiche (rumore) che possono disturbare altri circuiti vicini (o subire disturbi dall'esterno).</p>
+<p>Come ci si difende:</p>
+
+<li>Evitando piste troppo lunghe e parallele che fanno da accoppiamento capacitivo/induttivo;</li>
+
+<li>Utilizzando grandi aree di rame connesse a massa per schermare i segnali sensibili;</li>
+
+<li>Usando condensatori di disaccoppiamento vicini ai pin di alimentazione dei chip e schermature metalliche intorno alle parti a radiofrequenza.</li>
+						<p>Come porte logiche è importante ricordare: </p>
             <li>AND -> 1 se tutti INPUT = 1 </li>
             <li>OR -> 1 se almeno uno = 1 </li>
             <li>NOT -> inversione </li>
